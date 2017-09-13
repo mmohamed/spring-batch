@@ -6,7 +6,7 @@
 	<artifactId>batch</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
-	<name>Archetype - batch</name>
+	<name>SpringBatch</name>
 	<url>http://maven.apache.org</url>
 
 	<parent>
