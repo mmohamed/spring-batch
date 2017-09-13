@@ -16,13 +16,13 @@ import org.springframework.core.io.ClassPathResource;
 import com.medinvention.dao.Person;
 import com.medinvention.wrapper.PersonFieldSetMapper;
 
-public class PersonReader implements ItemReader<Person> {
+public class PersonReaderFromFile implements ItemReader<Person> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PersonReader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PersonReaderFromFile.class);
 
     private FlatFileItemReader<Person> reader;
 
-    public PersonReader() {
+    public PersonReaderFromFile() {
         initialize();
     }
 

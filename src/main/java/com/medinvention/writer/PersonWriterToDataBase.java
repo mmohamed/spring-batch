@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.medinvention.dao.IPersonRepository;
 import com.medinvention.dao.Person;
 
-public class PersonWriter implements ItemWriter<Person> {
+public class PersonWriterToDataBase implements ItemWriter<Person> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PersonWriter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PersonWriterToDataBase.class);
 
     @Autowired
     private IPersonRepository iPersonRepository;

@@ -14,13 +14,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.medinvention.dao.Person;
-import com.medinvention.processor.PersonItemProcessor;
-import com.medinvention.reader.PersonReader;
-import com.medinvention.writer.PersonWriter;
+import com.medinvention.processor.ImportPersonItemProcessor;
+import com.medinvention.reader.PersonReaderFromFile;
+import com.medinvention.writer.PersonWriterToDataBase;
 
 @Configuration
 @EnableBatchProcessing
-public class UnLoadPersonJobConfig {
+public class ImportPersonJobConfig {
 
     @Autowired
     public JobBuilderFactory jobBuilderFactory;
@@ -30,28 +30,28 @@ public class UnLoadPersonJobConfig {
 
     @Bean
     public ItemReader<Person> reader() {
-        return new PersonReader();
+        return new PersonReaderFromFile();
     }
 
     @Bean
-    public PersonItemProcessor processor() {
-        return new PersonItemProcessor();
+    public ImportPersonItemProcessor processor() {
+        return new ImportPersonItemProcessor();
     }
 
     @Bean
     public ItemWriter<Person> writer() {
-        return new PersonWriter();
+        return new PersonWriterToDataBase();
     }
 
     @Bean
-    public Job restorUserJob() {
-        return jobBuilderFactory.get("restorUserJob").incrementer(new RunIdIncrementer()).flow(stepRestor()).end()
+    public Job importUserJob() {
+        return jobBuilderFactory.get("importUserJob").incrementer(new RunIdIncrementer()).flow(stepImport()).end()
                 .build();
     }
 
     @Bean
-    public Step stepRestor() {
-        return stepBuilderFactory.get("stepRestor").<Person, Person>chunk(10).reader(reader()).processor(processor())
+    public Step stepImport() {
+        return stepBuilderFactory.get("step").<Person, Person>chunk(10).reader(reader()).processor(processor())
                 .writer(writer()).build();
     }
 }

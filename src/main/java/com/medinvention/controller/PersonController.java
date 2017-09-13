@@ -1,7 +1,9 @@
 package com.medinvention.controller;
 
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,12 +18,26 @@ public class PersonController {
     JobLauncher jobLauncher;
 
     @Autowired
-    @Qualifier("restorUserJob")
-    Job job;
+    @Qualifier("importUserJob")
+    Job importJob;
 
-    @RequestMapping(path = "/person/run", method = RequestMethod.GET)
-    public String run() throws Exception {
-        jobLauncher.run(job, new JobParameters());
-        return "OK runned with success! ";
+    @Autowired
+    @Qualifier("exportUserJob")
+    Job exportJob;
+
+    @RequestMapping(path = "/person/import", method = RequestMethod.GET)
+    public String runImport() throws Exception {
+        JobParameters parameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
+                .toJobParameters();
+        JobExecution jobResult = jobLauncher.run(importJob, parameters);
+        return "Import Job runned with exit status [" + jobResult.getExitStatus().toString() + "]";
+    }
+
+    @RequestMapping(path = "/person/export", method = RequestMethod.GET)
+    public String runExport() throws Exception {
+        JobParameters parameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
+                .toJobParameters();
+        JobExecution jobResult = jobLauncher.run(exportJob, parameters);
+        return "Export Job runned with exit status [" + jobResult.getExitStatus().toString() + "]";
     }
 }

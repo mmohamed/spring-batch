@@ -7,9 +7,9 @@ import org.springframework.batch.item.ItemProcessor;
 
 import com.medinvention.dao.Person;
 
-public class PersonItemProcessor implements ItemProcessor<Person, Person> {
+public class ImportPersonItemProcessor implements ItemProcessor<Person, Person> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PersonItemProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImportPersonItemProcessor.class);
 
     public Person process(final Person person) throws Exception {
         final String firstName = person.getFirstName().toUpperCase();
