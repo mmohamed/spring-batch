@@ -1,6 +1,5 @@
 package com.medinvention.reader;
 
-import org.medinvention.wrapper.PersonFieldSetMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ExecutionContext;
@@ -15,6 +14,7 @@ import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.core.io.ClassPathResource;
 
 import com.medinvention.dao.Person;
+import com.medinvention.wrapper.PersonFieldSetMapper;
 
 public class PersonReader implements ItemReader<Person> {
 

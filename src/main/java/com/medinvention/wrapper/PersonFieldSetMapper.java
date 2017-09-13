@@ -1,4 +1,4 @@
-package org.medinvention.wrapper;
+package com.medinvention.wrapper;
 
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
