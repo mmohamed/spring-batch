@@ -1,5 +1,11 @@
 package com.medinvention.wrapper;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.Locale;
+
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.validation.BindException;
@@ -14,6 +20,16 @@ public class PersonFieldSetMapper implements FieldSetMapper<Person> {
 
         person.setFirstName(fieldSet.readString("firstName"));
         person.setLastName(fieldSet.readString("lastName"));
+        person.setReference(fieldSet.readString("reference"));
+
+        String registrationDate = fieldSet.readString("registrationDate");
+
+        if (!registrationDate.isEmpty()) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/y", Locale.FRANCE);
+            LocalDate localDate = LocalDate.parse(registrationDate, formatter);
+            Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            person.setRegistredAt(date);
+        }
 
         return person;
     }

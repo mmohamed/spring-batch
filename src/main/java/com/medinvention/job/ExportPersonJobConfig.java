@@ -10,6 +10,7 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,30 +29,32 @@ public class ExportPersonJobConfig {
     @Autowired
     public StepBuilderFactory stepBuilderFactory;
 
-    @Bean
+    @Bean(name = "exportReader")
     public ItemReader<Person> reader() {
         return new PersonReaderFromDataBase();
     }
 
-    @Bean
+    @Bean(name = "exportProcessor")
     public ExportPersonItemProcessor processor() {
         return new ExportPersonItemProcessor();
     }
 
-    @Bean
+    @Bean(name = "exportWriter")
     public ItemWriter<Person> writer() {
         return new PersonWriterToFile();
     }
 
     @Bean
-    public Job exportUserJob() {
-        return jobBuilderFactory.get("exportUserJob").incrementer(new RunIdIncrementer()).flow(stepExport()).end()
-                .build();
+    public Job exportUserJob(@Qualifier("exportReader") ItemReader<Person> reader,
+            @Qualifier("exportWriter") ItemWriter<Person> writer,
+            @Qualifier("exportProcessor") ExportPersonItemProcessor processor) {
+        return jobBuilderFactory.get("exportUserJob").incrementer(new RunIdIncrementer())
+                .flow(stepExport(reader, writer, processor)).end().build();
     }
 
     @Bean
-    public Step stepExport() {
-        return stepBuilderFactory.get("stepExport").<Person, Person>chunk(10).reader(reader()).processor(processor())
-                .writer(writer()).build();
+    public Step stepExport(ItemReader<Person> reader, ItemWriter<Person> writer, ExportPersonItemProcessor processor) {
+        return stepBuilderFactory.get("stepExport").<Person, Person>chunk(10).reader(reader).processor(processor)
+                .writer(writer).build();
     }
 }

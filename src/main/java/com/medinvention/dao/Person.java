@@ -1,5 +1,7 @@
 package com.medinvention.dao;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,6 +22,12 @@ public class Person {
 
     @Column(name = "first_name")
     private String firstName;
+
+    @Column(name = "registredAt")
+    private Date registredAt;
+
+    @Column(name = "reference")
+    private String reference;
 
     public Person() {
 
@@ -52,6 +60,22 @@ public class Person {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public Date getRegistredAt() {
+        return registredAt;
+    }
+
+    public void setRegistredAt(Date registredAt) {
+        this.registredAt = registredAt;
+    }
+
+    public String getReference() {
+        return reference;
+    }
+
+    public void setReference(String reference) {
+        this.reference = reference;
     }
 
     @Override

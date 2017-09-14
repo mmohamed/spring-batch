@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,14 +30,13 @@ public class PersonWriterToFile implements ItemWriter<Person> {
     }
 
     public void write(List<? extends Person> items) throws Exception {
-
-        LOGGER.info("Received the information of " + items.size() + " persons to be writed on file");
-
         for (Person person : items) {
             this.collection.add(person);
         }
 
         ObjectMapper mapper = new ObjectMapper();
+        DateFormat df = new SimpleDateFormat("d/M/yyyy");
+        mapper.setDateFormat(df);
         String jsonInString = mapper.writeValueAsString(this.collection);
 
         try {

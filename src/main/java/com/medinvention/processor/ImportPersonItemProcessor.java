@@ -1,24 +1,16 @@
 
 package com.medinvention.processor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
 
 import com.medinvention.dao.Person;
 
 public class ImportPersonItemProcessor implements ItemProcessor<Person, Person> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ImportPersonItemProcessor.class);
-
     public Person process(final Person person) throws Exception {
-        final String firstName = person.getFirstName().toUpperCase();
-        final String lastName = person.getLastName().toUpperCase();
-
-        final Person transformedPerson = new Person(firstName, lastName);
-
-        LOGGER.info("Converting (" + person + ") into (" + transformedPerson + ")");
-
-        return transformedPerson;
+        person.setFirstName(person.getFirstName().toUpperCase());
+        person.setLastName(person.getLastName().toUpperCase());
+        person.setReference(String.format("REF%017d", Integer.valueOf(person.getReference())));
+        return person;
     }
 }
