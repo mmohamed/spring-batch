@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemWriter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.medinvention.dao.Person;
 
 public class PersonWriterToFile implements ItemWriter<Person> {
@@ -36,7 +37,8 @@ public class PersonWriterToFile implements ItemWriter<Person> {
 
         ObjectMapper mapper = new ObjectMapper();
         DateFormat df = new SimpleDateFormat("d/M/yyyy");
-        mapper.setDateFormat(df);
+        mapper.setDateFormat(df).writer().withDefaultPrettyPrinter();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
         String jsonInString = mapper.writeValueAsString(this.collection);
 
         try {
