@@ -6,11 +6,14 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -33,14 +36,34 @@ public class PersonController {
     @Qualifier("exportUserJob")
     Job exportJob;
 
+    @RequestMapping(path = "/person/async/import", method = RequestMethod.GET)
+    public String runAsyncImport() throws Exception {
+
+        SimpleJobLauncher simpleJobLauncher = new SimpleJobLauncher();
+        simpleJobLauncher.setJobRepository(jobRepository);
+
+        SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor();
+        simpleJobLauncher.setTaskExecutor(simpleAsyncTaskExecutor);
+
+        JobParameters parameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
+                .addString("filename", "sample-data-big.csv").toJobParameters();
+
+        JobExecution jobResult = simpleJobLauncher.run(importJob, parameters);
+
+        return "Import Job runned with exit status [" + jobResult.getExitStatus().toString() + "] at : "
+                + System.currentTimeMillis() + " with parameters : " + jobResult;
+    }
+
+    @RequestMapping(path = "/person/async/status", method = RequestMethod.GET)
+    public String viewAsyncStatus(@RequestParam(value = "id") Long id) throws Exception {
+
+        JobExecution jobExecution = jobExplorer.getJobExecution(id);
+
+        return jobExecution.toString();
+    }
+
     @RequestMapping(path = "/person/import", method = RequestMethod.GET)
     public String runImport() throws Exception {
-
-        // SimpleJobLauncher simpleJobLauncher = new SimpleJobLauncher();
-        // simpleJobLauncher.setJobRepository(jobRepository);
-        // SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new
-        // SimpleAsyncTaskExecutor();
-        // simpleJobLauncher.setTaskExecutor(simpleAsyncTaskExecutor);
 
         JobParameters parameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
                 .addString("filename", "sample-data.csv").toJobParameters();
