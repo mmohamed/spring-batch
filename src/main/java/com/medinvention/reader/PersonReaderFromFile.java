@@ -16,15 +16,11 @@ import com.medinvention.wrapper.PersonFieldSetMapper;
 
 public class PersonReaderFromFile implements ItemReader<Person> {
 
-    private FlatFileItemReader<Person> reader;
+    private FlatFileItemReader<Person> reader = null;
 
-    public PersonReaderFromFile() {
-        initialize();
-    }
-
-    private void initialize() {
+    public void initialize(String filename) {
         this.reader = new FlatFileItemReader<Person>();
-        this.reader.setResource(new FileSystemResource("sample-data.csv"));
+        this.reader.setResource(new FileSystemResource(filename));
 
         DefaultLineMapper<Person> lineMapper = new DefaultLineMapper<Person>();
 
@@ -44,9 +40,19 @@ public class PersonReaderFromFile implements ItemReader<Person> {
         reader.open(new ExecutionContext());
     }
 
-    public Person read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+    public void destroy() throws Exception {
+        if (null != this.reader) {
+            reader.close();
+        }
+        reader = null;
+    }
 
-        Person person = this.reader.read();
+    public Person read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+        if (null == reader) {
+            throw new Exception("FileReader don't initialized !");
+        }
+
+        Person person = reader.read();
 
         if (null == person) {
             return null;

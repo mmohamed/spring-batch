@@ -20,40 +20,37 @@ import com.medinvention.dao.Person;
 
 public class PersonWriterToFile implements ItemWriter<Person> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PersonWriterToFile.class);
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private List<Person> collection;
-
-    private Writer writer;
-
-    public PersonWriterToFile() {
-        this.collection = new ArrayList<Person>();
-    }
 
     public void write(List<? extends Person> items) throws Exception {
         for (Person person : items) {
             this.collection.add(person);
         }
+    }
 
+    public void initialize() {
+        collection = new ArrayList<Person>();
+    }
+
+    public void flush(String filename) {
         ObjectMapper mapper = new ObjectMapper();
+
         DateFormat df = new SimpleDateFormat("d/M/yyyy");
+
         mapper.setDateFormat(df).writer().withDefaultPrettyPrinter();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
-        String jsonInString = mapper.writeValueAsString(this.collection);
 
         try {
-            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("sample-data.json"), "utf-8"));
+            String jsonInString = mapper.writeValueAsString(collection);
+
+            Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename), "utf-8"));
             writer.write(jsonInString);
+            writer.close();
         }
         catch (IOException ex) {
-            LOGGER.error("Can't print JSON file");
-        }
-        finally {
-            try {
-                writer.close();
-            }
-            catch (Exception ex) {
-            }
+            log.error("Can't print JSON file");
         }
     }
 }

@@ -21,6 +21,7 @@ public class PersonReaderFromDataBase implements ItemReader<Person> {
         }
 
         if (!this.cursor.hasNext()) {
+            this.cursor = null;
             return null;
         }
 

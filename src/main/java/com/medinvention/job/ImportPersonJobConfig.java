@@ -15,8 +15,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.medinvention.dao.Person;
+import com.medinvention.listener.ImportJobExecutionListener;
 import com.medinvention.processor.ImportPersonItemProcessor;
 import com.medinvention.reader.PersonReaderFromFile;
+import com.medinvention.validator.FileNameParameterValidator;
 import com.medinvention.writer.PersonWriterToDataBase;
 
 @Configuration
@@ -24,10 +26,13 @@ import com.medinvention.writer.PersonWriterToDataBase;
 public class ImportPersonJobConfig {
 
     @Autowired
-    public JobBuilderFactory jobBuilderFactory;
+    private JobBuilderFactory jobBuilderFactory;
 
     @Autowired
-    public StepBuilderFactory stepBuilderFactory;
+    private StepBuilderFactory stepBuilderFactory;
+
+    @Autowired
+    private ImportJobExecutionListener importJobExecutionListener;
 
     @Bean(name = "importReader")
     public ItemReader<Person> reader() {
@@ -49,7 +54,8 @@ public class ImportPersonJobConfig {
             @Qualifier("importWriter") ItemWriter<Person> writer,
             @Qualifier("importProcessor") ImportPersonItemProcessor processor) {
         return jobBuilderFactory.get("importUserJob").incrementer(new RunIdIncrementer())
-                .flow(stepImport(reader, writer, processor)).end().build();
+                .flow(stepImport(reader, writer, processor)).end().listener(importJobExecutionListener)
+                .validator(new FileNameParameterValidator()).build();
     }
 
     @Bean

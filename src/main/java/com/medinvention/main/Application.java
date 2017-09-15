@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@ComponentScan(basePackages = { "com.medinvention.job", "com.medinvention.controller" })
+@ComponentScan(basePackages = { "com.medinvention.job", "com.medinvention.controller", "com.medinvention.listener" })
 @EnableJpaRepositories("com.medinvention.dao")
 @EntityScan("com.medinvention.dao")
 public class Application {

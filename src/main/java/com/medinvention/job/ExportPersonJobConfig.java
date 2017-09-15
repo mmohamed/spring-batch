@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.medinvention.dao.Person;
+import com.medinvention.listener.ExportJobExecutionListener;
 import com.medinvention.processor.ExportPersonItemProcessor;
 import com.medinvention.reader.PersonReaderFromDataBase;
 import com.medinvention.writer.PersonWriterToFile;
@@ -24,10 +25,13 @@ import com.medinvention.writer.PersonWriterToFile;
 public class ExportPersonJobConfig {
 
     @Autowired
-    public JobBuilderFactory jobBuilderFactory;
+    private JobBuilderFactory jobBuilderFactory;
 
     @Autowired
-    public StepBuilderFactory stepBuilderFactory;
+    private StepBuilderFactory stepBuilderFactory;
+
+    @Autowired
+    private ExportJobExecutionListener exportJobExecutionListener;
 
     @Bean(name = "exportReader")
     public ItemReader<Person> reader() {
@@ -49,7 +53,7 @@ public class ExportPersonJobConfig {
             @Qualifier("exportWriter") ItemWriter<Person> writer,
             @Qualifier("exportProcessor") ExportPersonItemProcessor processor) {
         return jobBuilderFactory.get("exportUserJob").incrementer(new RunIdIncrementer())
-                .flow(stepExport(reader, writer, processor)).end().build();
+                .flow(stepExport(reader, writer, processor)).end().listener(exportJobExecutionListener).build();
     }
 
     @Bean
