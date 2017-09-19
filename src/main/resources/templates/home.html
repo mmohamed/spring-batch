@@ -34,10 +34,7 @@
 
 		<div class="jumbotron">
 			<h1>Spring Batch Jobs!</h1>
-			<!-- 			<p class="lead">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet.</p> -->
-			<!-- 			<p> -->
-			<!-- 				<a class="btn btn-lg btn-success" href="#" role="button">Get started today</a> -->
-			<!-- 			</p> -->
+			<p class="lead">Available files for import [sample-data.csv , sample-data-big.csv] and for export [sample-data.json].</p>
 		</div>
 
 		<div class="row">
@@ -57,9 +54,10 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<div class="col-sm-offset-8 col-sm-9">
+								<div class="col-sm-offset-3 col-sm-9">
 									<button type="submit" class="btn btn-primary" name="run">Run</button>
 									<button type="submit" class="btn btn-success" name="runasync">Run Async</button>
+									<button type="submit" class="btn btn-warning" name="runmulti">Run Async + Multi threading</button>
 								</div>
 							</div>
 						</form>
@@ -82,9 +80,10 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<div class="col-sm-offset-8 col-sm-9">
+								<div class="col-sm-offset-3 col-sm-9">
 									<button type="submit" class="btn btn-primary" name="run">Run</button>
 									<button type="submit" class="btn btn-success" name="runasync">Run Async</button>
+									<button type="submit" class="btn btn-warning" name="runmulti">Run Async + Multi threading</button>
 								</div>
 							</div>
 						</form>
@@ -100,7 +99,7 @@
 	</div>
 
 	<script type="text/html" id="rowTemplate">
-	<div class="row">
+	<div class="row job-row">
 		<div class="col-lg-6"></div>
 		<div class="col-lg-6"></div>
 	</div>
@@ -108,14 +107,17 @@
 	
 	<script type="text/html" id="jobTemplate">
 	<div class="panel panel-default job-content" job-execution-id={{executionid}}>
-		<div class="panel-body">[{{jobid}}] - {{jobname}} <span class="badge">{{status}}</span></div>
-		<ul class="list-group">
-			<li class="list-group-item"><strong>Execution ID : </strong>{{executionid}}</li>
-			<li class="list-group-item"><strong>Started at : </strong><span class="started-at">{{startedat}}</span></li>
-			<li class="list-group-item"><strong>Finished at : </strong><span class="finished-at">{{finishedat}}<span></li>
-			<li class="list-group-item"><strong>Instance ID : </strong>{{instanceid}}</li>
-			<li class="list-group-item"><strong>Timer : </strong><span class="timer">{{timer}}</span></li>
-  		</ul>
+		<div class="panel-heading">
+			<h3 class="panel-title">[{{jobid}} | {{type}}] - {{jobname}} <span class="badge">{{status}}</span></h3>
+  		</div>
+		<div class="panel-body">
+			<p>
+				<strong>Execution ID : </strong>{{executionid}}<br>
+				<strong>Started at : </strong><span class="started-at">{{startedat}}</span> and <strong>finished at : </strong><span class="finished-at">{{finishedat}}</span><br>
+				<strong>Instance ID : </strong>{{instanceid}}<br>
+				<strong>Timer : </strong><span class="timer">{{timer}}</span>
+			</p>
+		</div>
 	</div>
 	</script>
 
@@ -137,7 +139,7 @@
 				contentType: 'json',
 				beforeSend: function(){ panel.block({message: 'update'});},
 				success: function(data){
-					$.updateJob(data);
+					$.updateJobView(data);
 				},
 				error: function(data){ 
 					setTimeout(function(){ $.getJobStatusJob(jobExecutionId) }, 3000);		
@@ -147,37 +149,59 @@
 		}
 		
 		// add new job container
-		$.addJob = function(jobData, column){
+		$.addJobView = function(jobData, column){
 			var newJobContent = $('#jobTemplate').html(),
 			
-			replaceData = {pattern : ['{{jobid}}', '{{jobname}}', '{{status}}', '{{executionid}}', '{{startedat}}', '{{finishedat}}', '{{instanceid}}', '{{timer}}'], 
-					replace : [jobData.jobInstanceReport.id, jobData.jobInstanceReport.jobName, jobData.status, jobData.id, jobData.startedAt, jobData.finishedAt, jobData.jobInstanceReport.instanceId, jobData.timer]}
+			replaceData = {pattern : ['{{jobid}}', '{{jobname}}', '{{status}}', '{{executionid}}', '{{startedat}}', '{{finishedat}}', '{{instanceid}}', '{{timer}}', '{{type}}'], 
+					replace : [jobData.jobInstanceReport.id, jobData.jobInstanceReport.jobName, jobData.status, jobData.id, jobData.startedAt, 
+						jobData.finishedAt, jobData.jobInstanceReport.instanceId, jobData.timer, jobData.type]}
 			for(var i=0;i<replaceData.pattern.length;i++){
-				newJobContent = newJobContent.replace(RegExp(replaceData.pattern[i], 'g'), replaceData.replace[i]);
+				newJobContent = newJobContent.replace(RegExp(replaceData.pattern[i], 'g'), replaceData.replace[i] == null ? '--/--/-- --:--:--' : replaceData.replace[i]);
 			}
 			
 			if(!column || 0 == column){
-				if($.trim($('div.row:last > div.col-lg-6:first').html())!=''){
+				var container = null;
+				$('div.job-row').each(function(index){
+					if(null != container) return;
+					if($.trim($(this).find('div.col-lg-6:first').html()) == ''){
+						container = $(this).find('div.col-lg-6:first');
+						return;
+					}
+				});
+				if(null == container){
 					$('div.row:last').after($('#rowTemplate').html());
+					container = $('div.row:last').find('div.col-lg-6:first');
 				}
-				$('div.row:last > div.col-lg-6:first').append(newJobContent);
+				container.append(newJobContent);
 			}else{
-				if($.trim($('div.row:last > div.col-lg-6:last').html())!=''){
+				var container = null;
+				$('div.job-row').each(function(index){
+					if(null != container) return;
+					if($.trim($(this).find('div.col-lg-6:last').html()) == ''){
+						container = $(this).find('div.col-lg-6:last');
+					}
+				});
+				if(null == container){
 					$('div.row:last').after($('#rowTemplate').html());
+					container = $('div.row:last').find('div.col-lg-6:last');
 				}
-				$('div.row:last > div.col-lg-6:last').append(newJobContent);
+				container.append(newJobContent);
 			}
 			
 			if(jobData.running){
 				setTimeout(function(){ $.getJobStatusJob(jobData.id); }, 3000);
 			}
+			
+			$('html, body').animate({
+		        scrollTop: $('div[job-execution-id='+jobData.id+']').offset().top
+		    }, 1000);
 		}
 		
-		$.updateJob = function(jobData){
+		$.updateJobView = function(jobData){
 			var panel = $('div[job-execution-id='+jobData.id+']');
 			panel.find('span.badge').text(jobData.status);
-			panel.find('span.finished-at').text(jobData.finishedAt);
-			panel.find('span.started-at').text(jobData.startedAt);
+			panel.find('span.finished-at').text(jobData.finishedAt == null ? '--/--/-- --:--:--' : jobData.finishedAt);
+			panel.find('span.started-at').text(jobData.startedAt == null ? '--/--/-- --:--:--' : jobData.startedAt);
 			panel.find('span.timer').text(jobData.timer);
 			if(jobData.running){
 				setTimeout(function(){ $.getJobStatusJob(jobData.id) }, 3000);
@@ -185,8 +209,9 @@
 			}
 		}
 		
-		$('form[name=importForm]').find('[name=run], [name=runasync]').click(function(){
+		$('form[name=importForm]').find('[name=run], [name=runasync], [name=runmulti]').click(function(){
 			var async = $(this).attr('name') == 'runasync', 
+				multi = $(this).attr('name') == 'runmulti', 
 				filename = $('input[name=sourcefilename]').val(),
 				panel = $(this).closest('div.panel'),
 				alert = panel.find('div.alert');
@@ -197,13 +222,13 @@
 				return;
 			}
 			$.ajax({
-				url: async ? '/person/async/import' : '/person/import',
+				url: (multi ? '/person/multithread/import' : (async ? '/person/async/import' : '/person/import')),
 				data : {'filename' : filename},
 				contentType: 'json',
 				beforeSend: function(){ panel.block({message: 'process'});},
 				success: function(data){
 					$('input[name=sourcefilename]').val('');
-					$.addJob(data, 0);
+					$.addJobView(data, 0);
 				},
 				error: function(data){ 
 					alert.find('span.error-message').text(data.responseText)
@@ -219,8 +244,9 @@
 			return false;
 		});
 		
-		$('form[name=exportForm]').find('[name=run], [name=runasync]').click(function(){
+		$('form[name=exportForm]').find('[name=run], [name=runasync], [name=runmulti]').click(function(){
 			var async = $(this).attr('name') == 'runasync', 
+				multi = $(this).attr('name') == 'runmulti', 
 				filename = $('input[name=outputfilename]').val(),
 				panel = $(this).closest('div.panel'),
 				alert = panel.find('div.alert');
@@ -231,13 +257,13 @@
 				return;
 			}
 			$.ajax({
-				url: async ? '/person/async/export' : '/person/export',
+				url: (multi ? '/person/multithread/export' : (async ? '/person/async/export' : '/person/export')),
 				data : {'filename' : filename},
 				contentType: 'json',
 				beforeSend: function(){ panel.block({message: 'process'});},
 				success: function(data){
 					$('input[name=outputfilename]').val('');
-					$.addJob(data, 1);
+					$.addJobView(data, 1);
 				},
 				error: function(data){ 
 					alert.find('span.error-message').text(data.responseText)

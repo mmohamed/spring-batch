@@ -18,6 +18,7 @@ public class ExecutionReport {
     private JobInstanceReport jobInstanceReport;
     private Boolean isRunning;
     private Double timer;
+    private String type;
 
     /**
      * Default Constructor.
@@ -26,15 +27,17 @@ public class ExecutionReport {
      * @param status
      * @param startTime
      * @param endTime
+     * @param type
      */
     public ExecutionReport(JobInstanceReport jobInstanceReport, Long id, BatchStatus status, Date startTime,
-            Date endTime) {
+            Date endTime, String type) {
         this.jobInstanceReport = jobInstanceReport;
         this.id = id;
         this.status = status.toString();
         this.startedAt = startTime;
         this.finishedAt = endTime;
         this.isRunning = status.isRunning();
+        this.type = type;
 
         if (null == startTime) {
             this.timer = 0D;
@@ -47,8 +50,11 @@ public class ExecutionReport {
     }
 
     public static ExecutionReport createFromJobExecution(JobExecution jobExecution) {
+        String type = jobExecution.getJobParameters().getString("type", "NORMAL");
+
         return new ExecutionReport(JobInstanceReport.createFromJobInstance(jobExecution.getJobInstance()),
-                jobExecution.getId(), jobExecution.getStatus(), jobExecution.getStartTime(), jobExecution.getEndTime());
+                jobExecution.getId(), jobExecution.getStatus(), jobExecution.getStartTime(), jobExecution.getEndTime(),
+                type);
     }
 
     /**
@@ -147,5 +153,19 @@ public class ExecutionReport {
      */
     public void setTimer(Double timer) {
         this.timer = timer;
+    }
+
+    /**
+     * @return the type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(String type) {
+        this.type = type;
     }
 }

@@ -56,16 +56,11 @@ public class PersonController {
         return ExecutionReport.createFromJobExecution(jobExecution);
     }
 
-    @RequestMapping(value = { "/person/import", "person/async/import" }, method = RequestMethod.GET)
+    @RequestMapping(value = { "/person/import", "person/async/import",
+            "person/multithread/import" }, method = RequestMethod.GET)
     public ExecutionReport runImport(HttpServletRequest request, @RequestParam String filename) throws Exception {
         Boolean isAsync = request.getRequestURI().equals("/person/async/import");
-
-        if (isAsync) {
-            filename = "sample-data-big.csv";
-        }
-        else {
-            filename = "sample-data.csv";
-        }
+        Boolean isMultiThreading = request.getRequestURI().equals("/person/multithread/import");
 
         File file = new File(filename);
 
@@ -78,15 +73,22 @@ public class PersonController {
         }
 
         JobParameters parameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
-                .addString("filename", filename).toJobParameters();
+                .addString("filename", filename)
+                .addString("type", isMultiThreading ? "MULTI-THREADING" : (isAsync ? "ASYNC" : "NORMAL"))
+                .toJobParameters();
 
         JobExecution jobResult;
 
-        if (isAsync) {
+        if (isAsync || isMultiThreading) {
             SimpleJobLauncher simpleJobLauncher = new SimpleJobLauncher();
             simpleJobLauncher.setJobRepository(jobRepository);
 
             SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor();
+
+            if (isMultiThreading) {
+                simpleAsyncTaskExecutor.setConcurrencyLimit(5);
+            }
+
             simpleJobLauncher.setTaskExecutor(simpleAsyncTaskExecutor);
 
             jobResult = simpleJobLauncher.run(importJob, parameters);
@@ -98,27 +100,34 @@ public class PersonController {
         return ExecutionReport.createFromJobExecution(jobResult);
     }
 
-    @RequestMapping(value = { "/person/export", "/person/async/export" }, method = RequestMethod.GET)
+    @RequestMapping(value = { "/person/export", "/person/async/export",
+            "/person/multithread/export" }, method = RequestMethod.GET)
     public ExecutionReport runExport(HttpServletRequest request, @RequestParam String filename) throws Exception {
 
         Boolean isAsync = request.getRequestURI().equals("/person/async/export");
-
-        filename = "sample-data.json";
+        Boolean isMultiThreading = request.getRequestURI().equals("/person/multithread/export");
 
         if (filename.length() < 6 || 0 != filename.substring(filename.length() - 5).toLowerCase().compareTo(".json")) {
             throw new BadRequestException(String.format("File with name [%s] not validate (not json) !", filename));
         }
 
         JobParameters parameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
-                .addString("filename", "sample-data.json").toJobParameters();
+                .addString("filename", "sample-data.json")
+                .addString("type", isMultiThreading ? "MULTI-THREADING" : (isAsync ? "ASYNC" : "NORMAL"))
+                .toJobParameters();
 
         JobExecution jobResult;
 
-        if (isAsync) {
+        if (isAsync || isMultiThreading) {
             SimpleJobLauncher simpleJobLauncher = new SimpleJobLauncher();
             simpleJobLauncher.setJobRepository(jobRepository);
 
             SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor();
+
+            if (isMultiThreading) {
+                simpleAsyncTaskExecutor.setConcurrencyLimit(5);
+            }
+
             simpleJobLauncher.setTaskExecutor(simpleAsyncTaskExecutor);
 
             jobResult = simpleJobLauncher.run(exportJob, parameters);
