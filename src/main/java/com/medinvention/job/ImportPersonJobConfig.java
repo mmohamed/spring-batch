@@ -59,7 +59,9 @@ public class ImportPersonJobConfig {
     }
 
     @Bean
-    public Step stepImport(ItemReader<Person> reader, ItemWriter<Person> writer, ImportPersonItemProcessor processor) {
+    public Step stepImport(@Qualifier("importReader") ItemReader<Person> reader,
+            @Qualifier("importWriter") ItemWriter<Person> writer,
+            @Qualifier("importProcessor") ImportPersonItemProcessor processor) {
         return stepBuilderFactory.get("step").<Person, Person>chunk(10).reader(reader).processor(processor)
                 .writer(writer).build();
     }

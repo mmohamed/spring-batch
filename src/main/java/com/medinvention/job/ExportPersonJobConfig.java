@@ -57,7 +57,9 @@ public class ExportPersonJobConfig {
     }
 
     @Bean
-    public Step stepExport(ItemReader<Person> reader, ItemWriter<Person> writer, ExportPersonItemProcessor processor) {
+    public Step stepExport(@Qualifier("exportReader") ItemReader<Person> reader,
+            @Qualifier("exportWriter") ItemWriter<Person> writer,
+            @Qualifier("exportProcessor") ExportPersonItemProcessor processor) {
         return stepBuilderFactory.get("stepExport").<Person, Person>chunk(10).reader(reader).processor(processor)
                 .writer(writer).build();
     }

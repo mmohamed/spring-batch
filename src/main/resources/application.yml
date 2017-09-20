@@ -1,0 +1,13 @@
+spring:
+    jpa:
+        hibernate.ddl-auto: none
+    datasource:
+        url: 'jdbc:mysql://localhost:3306/batch'
+        username: 'root'  
+        password: 'root'
+    thymeleaf:
+        mode: LEGACYHTML5  
+        cache: false  
+    batch:
+        job.enabled: false
+        initializer.enabled: true
