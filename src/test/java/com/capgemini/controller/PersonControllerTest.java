@@ -17,8 +17,8 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.capgemini.job.report.ExecutionReport;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class PersonControllerTest extends AbstractControllerTest {
 
@@ -50,6 +50,22 @@ public class PersonControllerTest extends AbstractControllerTest {
         this.mvc.perform(get("/person/export?filename=abc")).andExpect(status().isBadRequest())
                 .andExpect(content().contentType(TEXT_PLAIN_UTF8))
                 .andExpect(content().string("[BadRequest] File with name [abc] not validate (not json) !"));
+    }
+
+    @Test
+    public void testImportExportValidation() throws Exception {
+
+        // required file
+        this.mvc.perform(get("/person/transform")).andExpect(status().isBadRequest());
+
+        // invalid file type
+        this.mvc.perform(get("/person/transform?filename=abc")).andExpect(status().isBadRequest())
+                .andExpect(content().contentType(TEXT_PLAIN_UTF8))
+                .andExpect(content().string("[BadRequest] File with name [abc] not found !"));
+        // file not found
+        this.mvc.perform(get("/person/transform?filename=abc.csv")).andExpect(status().isBadRequest())
+                .andExpect(content().contentType(TEXT_PLAIN_UTF8))
+                .andExpect(content().string("[BadRequest] File with name [abc.csv] not found !"));
     }
 
     @Test

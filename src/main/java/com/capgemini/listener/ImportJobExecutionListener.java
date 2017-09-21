@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -17,9 +16,11 @@ public class ImportJobExecutionListener implements JobExecutionListener {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
-    @Qualifier("importReader")
     ItemReader<Person> reader;
+
+    public ImportJobExecutionListener(@Qualifier("importReader") ItemReader<Person> reader) {
+        this.reader = reader;
+    }
 
     public void beforeJob(JobExecution jobExecution) {
         String filename = jobExecution.getJobParameters().getString("filename");

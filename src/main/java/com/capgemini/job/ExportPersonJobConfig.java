@@ -30,9 +30,6 @@ public class ExportPersonJobConfig {
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
 
-    @Autowired
-    private ExportJobExecutionListener exportJobExecutionListener;
-
     @Bean(name = "exportReader")
     public ItemReader<Person> reader() {
         return new PersonReaderFromDataBase();
@@ -53,10 +50,11 @@ public class ExportPersonJobConfig {
             @Qualifier("exportWriter") ItemWriter<Person> writer,
             @Qualifier("exportProcessor") ExportPersonItemProcessor processor) {
         return jobBuilderFactory.get("exportUserJob").incrementer(new RunIdIncrementer())
-                .flow(stepExport(reader, writer, processor)).end().listener(exportJobExecutionListener).build();
+                .flow(stepExport(reader, writer, processor)).end().listener(new ExportJobExecutionListener(writer))
+                .build();
     }
 
-    @Bean
+    @Bean(name = "stepExport")
     public Step stepExport(@Qualifier("exportReader") ItemReader<Person> reader,
             @Qualifier("exportWriter") ItemWriter<Person> writer,
             @Qualifier("exportProcessor") ExportPersonItemProcessor processor) {

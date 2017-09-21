@@ -31,9 +31,6 @@ public class ImportPersonJobConfig {
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
 
-    @Autowired
-    private ImportJobExecutionListener importJobExecutionListener;
-
     @Bean(name = "importReader")
     public ItemReader<Person> reader() {
         return new PersonReaderFromFile();
@@ -54,15 +51,15 @@ public class ImportPersonJobConfig {
             @Qualifier("importWriter") ItemWriter<Person> writer,
             @Qualifier("importProcessor") ImportPersonItemProcessor processor) {
         return jobBuilderFactory.get("importUserJob").incrementer(new RunIdIncrementer())
-                .flow(stepImport(reader, writer, processor)).end().listener(importJobExecutionListener)
+                .flow(stepImport(reader, writer, processor)).end().listener(new ImportJobExecutionListener(reader))
                 .validator(new FileNameParameterValidator()).build();
     }
 
-    @Bean
+    @Bean(name = "stepImport")
     public Step stepImport(@Qualifier("importReader") ItemReader<Person> reader,
             @Qualifier("importWriter") ItemWriter<Person> writer,
             @Qualifier("importProcessor") ImportPersonItemProcessor processor) {
-        return stepBuilderFactory.get("step").<Person, Person>chunk(10).reader(reader).processor(processor)
+        return stepBuilderFactory.get("stepImport").<Person, Person>chunk(10).reader(reader).processor(processor)
                 .writer(writer).build();
     }
 }

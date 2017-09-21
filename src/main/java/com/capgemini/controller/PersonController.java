@@ -44,6 +44,10 @@ public class PersonController {
     @Qualifier("exportUserJob")
     Job exportJob;
 
+    @Autowired
+    @Qualifier("importExportUserJob")
+    Job importExportJob;
+
     @RequestMapping(path = "/job/status", method = RequestMethod.GET)
     public ExecutionReport jobStatus(@RequestParam(value = "id") Long id) throws Exception {
 
@@ -135,6 +139,35 @@ public class PersonController {
         else {
             jobResult = jobLauncher.run(exportJob, parameters);
         }
+
+        return ExecutionReport.createFromJobExecution(jobResult);
+    }
+
+    @RequestMapping(value = { "/person/transform" }, method = RequestMethod.GET)
+    public ExecutionReport runImportExport(HttpServletRequest request, @RequestParam String filename) throws Exception {
+
+        File file = new File(filename);
+
+        if (!file.exists() || file.isDirectory()) {
+            throw new BadRequestException(String.format("File with name [%s] not found !", filename));
+        }
+
+        if (filename.length() < 5 || 0 != filename.substring(filename.length() - 4).toLowerCase().compareTo(".csv")) {
+            throw new BadRequestException(String.format("File with name [%s] not validate (not csv) !", filename));
+        }
+
+        JobParameters parameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
+                .addString("filename", filename).addString("type", "N").toJobParameters();
+
+        SimpleJobLauncher simpleJobLauncher = new SimpleJobLauncher();
+        simpleJobLauncher.setJobRepository(jobRepository);
+
+        SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor("async_import_export_user");
+
+        simpleAsyncTaskExecutor.setConcurrencyLimit(10);
+        simpleJobLauncher.setTaskExecutor(simpleAsyncTaskExecutor);
+
+        JobExecution jobResult = simpleJobLauncher.run(importExportJob, parameters);
 
         return ExecutionReport.createFromJobExecution(jobResult);
     }

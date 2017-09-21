@@ -39,7 +39,7 @@
 
 		<div class="row">
 			
-			<div class="col-lg-6">
+			<div class="col-lg-4">
 				<div class="panel panel-danger">
 					<div class="panel-heading">
 						<h3 class="panel-title">Import</h3>
@@ -54,10 +54,10 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<div class="col-sm-offset-3 col-sm-9">
+								<div class="col-sm-12">
 									<button type="submit" class="btn btn-primary" name="run">Run</button>
 									<button type="submit" class="btn btn-success" name="runasync">Run Async</button>
-									<button type="submit" class="btn btn-warning" name="runmulti">Run Async + Multi threading</button>
+									<button type="submit" class="btn btn-warning" name="runmulti">Run Multi thread</button>
 								</div>
 							</div>
 						</form>
@@ -65,7 +65,7 @@
 				</div>
 			</div>
 			
-			<div class="col-lg-6">
+			<div class="col-lg-4">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
 						<h3 class="panel-title">Export</h3>
@@ -80,10 +80,34 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<div class="col-sm-offset-3 col-sm-9">
+								<div class="col-sm-12">
 									<button type="submit" class="btn btn-primary" name="run">Run</button>
 									<button type="submit" class="btn btn-success" name="runasync">Run Async</button>
-									<button type="submit" class="btn btn-warning" name="runmulti">Run Async + Multi threading</button>
+									<button type="submit" class="btn btn-warning" name="runmulti">Run Multi thread</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			
+			<div class="col-lg-4">
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<h3 class="panel-title">Import and Export</h3>
+					</div>
+					<div class="panel-body">
+						<div class="alert alert-danger hide" role="alert"><strong>Error !</strong><span class="error-message"></span> </div>
+						<form class="form-horizontal" name="importExportForm">
+							<div class="form-group">
+								<label class="control-label col-sm-5" for="file">Source filename (*.csv)</label>
+								<div class="col-sm-7">
+									<input type="text" class="form-control" id="file" name="sourceoutputfilename">
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-offset-3 col-sm-9">
+									<button type="submit" class="btn btn-danger" name="runmulti">Run Async + Multi thread</button>
 								</div>
 							</div>
 						</form>
@@ -100,8 +124,9 @@
 
 	<script type="text/html" id="rowTemplate">
 	<div class="row job-row">
-		<div class="col-lg-6"></div>
-		<div class="col-lg-6"></div>
+		<div class="col-lg-4"></div>
+		<div class="col-lg-4"></div>
+  		<div class="col-lg-4"></div>
 	</div>
 	</script>
 	
@@ -163,27 +188,40 @@
 				var container = null;
 				$('div.job-row').each(function(index){
 					if(null != container) return;
-					if($.trim($(this).find('div.col-lg-6:first').html()) == ''){
-						container = $(this).find('div.col-lg-6:first');
+					if($.trim($(this).find('div.col-lg-4:first').html()) == ''){
+						container = $(this).find('div.col-lg-4:first');
 						return;
 					}
 				});
 				if(null == container){
 					$('div.row:last').after($('#rowTemplate').html());
-					container = $('div.row:last').find('div.col-lg-6:first');
+					container = $('div.row:last').find('div.col-lg-4:first');
+				}
+				container.append(newJobContent);
+			}else if (2 == column){
+				var container = null;
+				$('div.job-row').each(function(index){
+					if(null != container) return;
+					if($.trim($(this).find('div.col-lg-4:last').html()) == ''){
+						container = $(this).find('div.col-lg-4:last');
+					}
+				});
+				if(null == container){
+					$('div.row:last').after($('#rowTemplate').html());
+					container = $('div.row:last').find('div.col-lg-4:last');
 				}
 				container.append(newJobContent);
 			}else{
 				var container = null;
 				$('div.job-row').each(function(index){
 					if(null != container) return;
-					if($.trim($(this).find('div.col-lg-6:last').html()) == ''){
-						container = $(this).find('div.col-lg-6:last');
+					if($.trim($(this).find('div.col-lg-4:eq(1)').html()) == ''){
+						container = $(this).find('div.col-lg-4:eq(1)');
 					}
 				});
 				if(null == container){
 					$('div.row:last').after($('#rowTemplate').html());
-					container = $('div.row:last').find('div.col-lg-6:last');
+					container = $('div.row:last').find('div.col-lg-4:eq(1)');
 				}
 				container.append(newJobContent);
 			}
@@ -240,7 +278,7 @@
 			return false;
 		});
 		
-		$('form[name=importForm], form[name=exportForm]').submit(function() {
+		$('form[name=importForm], form[name=exportForm], form[name=importexportForm]').submit(function() {
 			return false;
 		});
 		
@@ -264,6 +302,35 @@
 				success: function(data){
 					$('input[name=outputfilename]').val('');
 					$.addJobView(data, 1);
+				},
+				error: function(data){ 
+					alert.find('span.error-message').text(data.responseText)
+					alert.removeClass('hide');
+				},
+				complete: function(){ panel.unblock(); }
+			});
+			
+			return false;
+		});
+		
+		$('form[name=importExportForm]').find('[name=runmulti]').click(function(){
+			var filename = $('input[name=sourceoutputfilename]').val(),
+				panel = $(this).closest('div.panel'),
+				alert = panel.find('div.alert');
+			alert.addClass('hide');
+			if(filename == ''){
+				alert.find('span.error-message').text('Please provide a filename !')
+				alert.removeClass('hide');
+				return;
+			}
+			$.ajax({
+				url: '/person/transform',
+				data : {'filename' : filename},
+				contentType: 'json',
+				beforeSend: function(){ panel.block({message: 'process'});},
+				success: function(data){
+					$('input[name=sourceoutputfilename]').val('');
+					$.addJobView(data, 2);
 				},
 				error: function(data){ 
 					alert.find('span.error-message').text(data.responseText)
