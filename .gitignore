@@ -2,3 +2,4 @@
 .project
 .settings/
 /target/
+sample-data.json
