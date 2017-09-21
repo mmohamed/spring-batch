@@ -69,5 +69,18 @@ public class ImportPersonJobTest {
         assertTrue(failureExceptions.isEmpty());
 
         assertEquals(1000, personRepository.count());
+
+        parameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
+                .addString("filename", "sample-data.csv").toJobParameters();
+
+        jobExecution = jobLauncher.run(importJob, parameters);
+
+        assertNotNull(jobExecution);
+
+        batchStatus = jobExecution.getStatus();
+        assertEquals(BatchStatus.COMPLETED, batchStatus);
+        assertFalse(batchStatus.isUnsuccessful());
+
+        assertEquals(2000, personRepository.count());
     }
 }
