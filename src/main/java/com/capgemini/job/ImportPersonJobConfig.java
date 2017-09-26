@@ -7,6 +7,7 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import com.capgemini.entity.Person;
 import com.capgemini.listener.ImportJobExecutionListener;
 import com.capgemini.processor.ImportPersonItemProcessor;
 import com.capgemini.reader.PersonReaderFromFile;
+import com.capgemini.tasklet.CleanDBTasklet;
 import com.capgemini.validator.FileNameParameterValidator;
 import com.capgemini.writer.PersonWriterToDataBase;
 
@@ -46,13 +48,23 @@ public class ImportPersonJobConfig {
         return new PersonWriterToDataBase();
     }
 
+    @Bean(name = "importCleaner")
+    public Tasklet cleaner() {
+        return new CleanDBTasklet();
+    }
+
     @Bean
     public Job importUserJob(@Qualifier("importReader") ItemReader<Person> reader,
             @Qualifier("importWriter") ItemWriter<Person> writer,
             @Qualifier("importProcessor") ImportPersonItemProcessor processor) {
-        return jobBuilderFactory.get("importUserJob").incrementer(new RunIdIncrementer())
-                .flow(stepImport(reader, writer, processor)).end().listener(new ImportJobExecutionListener(reader))
+        return jobBuilderFactory.get("importUserJob").incrementer(new RunIdIncrementer()).flow(stepClean())
+                .next(stepImport(reader, writer, processor)).end().listener(new ImportJobExecutionListener(reader))
                 .validator(new FileNameParameterValidator()).build();
+    }
+
+    @Bean(name = "stepClean")
+    public Step stepClean() {
+        return stepBuilderFactory.get("stepClean").tasklet(cleaner()).build();
     }
 
     @Bean(name = "stepImport")

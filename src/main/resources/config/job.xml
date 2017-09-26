@@ -9,8 +9,11 @@
 	<bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
 
 	<batch:job id="transformJob">
-		<batch:step id="deleteDir" next="countThread">
+		<batch:step id="deleteDir" next="cleanDB">
 			<batch:tasklet ref="fileDeletingTasklet" />
+		</batch:step>
+		<batch:step id="cleanDB" next="countThread">
+			<batch:tasklet ref="cleanDBTasklet" />
 		</batch:step>
 		<batch:step id="countThread" next="split">
 			<batch:tasklet ref="countThreadTasklet" />
@@ -52,6 +55,10 @@
 
 	<bean id="countThreadTasklet" class="com.capgemini.tasklet.CountingTasklet" scope="step">
 		<property name="input" value="file:csv/input/#{jobParameters[filename]}" />
+	</bean>
+	
+	<bean id="cleanDBTasklet" class="com.capgemini.tasklet.CleanDBTasklet">
+		<property name="iPersonRepository" ref="IPersonRepository"  />
 	</bean>
 	
 	<bean id="fileDeletingTasklet" class="com.capgemini.tasklet.FileDeletingTasklet">
