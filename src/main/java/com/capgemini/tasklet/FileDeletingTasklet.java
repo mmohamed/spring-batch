@@ -23,13 +23,24 @@ public class FileDeletingTasklet implements Tasklet {
 
         File[] files = dir.listFiles();
         for (int i = 0; i < files.length; i++) {
-            boolean deleted = files[i].delete();
-            if (!deleted) {
-                throw new UnexpectedJobExecutionException("Could not delete file " + files[i].getPath());
+
+            String extension = "";
+
+            int index = files[i].getName().lastIndexOf('.');
+            if (index > 0) {
+                extension = files[index].getName().substring(index + 1);
             }
-            else {
-                log.info(files[i].getPath() + " is deleted!");
+
+            if ("csv" == extension) {
+                boolean deleted = files[i].delete();
+                if (!deleted) {
+                    throw new UnexpectedJobExecutionException("Could not delete file " + files[i].getPath());
+                }
+                else {
+                    log.info(files[i].getPath() + " is deleted!");
+                }
             }
+
         }
         return RepeatStatus.FINISHED;
     }

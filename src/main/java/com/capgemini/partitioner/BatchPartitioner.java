@@ -26,7 +26,15 @@ public class BatchPartitioner implements Partitioner {
         Map<String, ExecutionContext> result = new HashMap<String, ExecutionContext>();
 
         for (File file : fList) {
-            if (file.isFile()) {
+
+            String extension = "";
+
+            int i = file.getName().lastIndexOf('.');
+            if (i > 0) {
+                extension = file.getName().substring(i + 1);
+            }
+
+            if ("csv" == extension && file.isFile()) {
 
                 ExecutionContext exContext = new ExecutionContext();
                 log.info("Starting : Thread [" + index + "] for file : " + file.getName());
