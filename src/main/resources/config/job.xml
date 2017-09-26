@@ -71,7 +71,7 @@
 
 	<bean id="largeCSVReader" class="com.capgemini.reader.LineReaderFromFile"
 		scope="step">
-		<property name="inputPath" value="csv/input/sample-data.csv" />
+		<property name="inputPath" value="csv/input/#{jobParameters[filename]}" />
 	</bean>
 
 	<bean id="smallCSVWriter" class="com.capgemini.writer.LineWriterToFile"

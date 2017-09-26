@@ -34,7 +34,7 @@ public class BatchPartitioner implements Partitioner {
                 extension = file.getName().substring(i + 1);
             }
 
-            if ("csv" == extension && file.isFile()) {
+            if (0 == extension.compareTo("csv") && file.isFile()) {
 
                 ExecutionContext exContext = new ExecutionContext();
                 log.info("Starting : Thread [" + index + "] for file : " + file.getName());
