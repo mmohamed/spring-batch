@@ -1,4 +1,4 @@
-package com.capgemini.dao;
+package com.capgemini.entity;
 
 import java.util.Date;
 
@@ -23,7 +23,7 @@ public class Person {
     @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "registredAt")
+    @Column(name = "registred_at")
     private Date registredAt;
 
     @Column(name = "reference")

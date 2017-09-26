@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+        http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
+
+	<import resource="context.xml" />
+
+	<bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
+
+	<batch:job id="transformJob">
+		<batch:step id="deleteDir" next="countThread">
+			<batch:tasklet ref="fileDeletingTasklet" />
+		</batch:step>
+		<batch:step id="countThread" next="split">
+			<batch:tasklet ref="countThreadTasklet" />
+		</batch:step>
+		<batch:step id="split" next="partitionerMaster">
+			<batch:tasklet>
+				<batch:chunk reader="largeCSVReader" writer="smallCSVWriter"
+					commit-interval="#{jobExecutionContext['chunk.count']}" />
+			</batch:tasklet>
+		</batch:step>
+		<batch:step id="partitionerMaster" next="export">
+			<partition step="importChunked" partitioner="batchPartitioner">
+				<handler grid-size="10" task-executor="taskExecutor" />
+			</partition>
+		</batch:step>
+		<batch:step id="export">
+			<batch:tasklet>
+				<batch:chunk reader="dbReader" writer="jsonFileWriter"
+					commit-interval="500" />
+			</batch:tasklet>
+		</batch:step>
+	</batch:job>
+
+	<batch:step id="importChunked">
+		<batch:tasklet>
+			<batch:chunk reader="smallCSVFileReader" writer="dbWriter"
+				processor="importProcessor" commit-interval="5">
+			</batch:chunk>
+		</batch:tasklet>
+	</batch:step>
+	
+	 <bean id="jsonFileWriter" class="com.capgemini.writer.PersonWriterToFile" scope="step">
+        <property name="outputPath" value="csv/output/export.json" />
+    </bean>
+    
+	<bean id="dbReader" class="com.capgemini.reader.PersonReaderFromDataBase">
+		<property name="iPersonRepository" ref="IPersonRepository" />
+	</bean>
+
+	<bean id="countThreadTasklet" class="com.capgemini.tasklet.CountingTasklet" scope="step">
+		<property name="input" value="file:csv/input/#{jobParameters[filename]}" />
+	</bean>
+	
+	<bean id="fileDeletingTasklet" class="com.capgemini.tasklet.FileDeletingTasklet">
+		<property name="directory" value="file:csv/chunked/" />
+	</bean>
+
+	<bean id="batchPartitioner" class="com.capgemini.partitioner.BatchPartitioner">
+		<property name="outputPath" value="csv/chunked/" />
+	</bean>
+
+	<bean id="largeCSVReader" class="com.capgemini.reader.LineReaderFromFile"
+		scope="step">
+		<property name="inputPath" value="csv/input/sample-data.csv" />
+	</bean>
+
+	<bean id="smallCSVWriter" class="com.capgemini.writer.LineWriterToFile"
+		scope="step">
+		<property name="outputPath" value="csv/chunked/"></property>
+	</bean>
+
+	<bean id="smallCSVFileReader" class="com.capgemini.reader.PersonReaderFromFile"
+		scope="step">
+		<constructor-arg value="csv/chunked/#{stepExecutionContext[file]}" />
+	</bean>
+
+	<bean id="importProcessor" class="com.capgemini.processor.ImportPersonItemProcessor" />
+
+	<bean id="dbWriter" class="com.capgemini.writer.PersonWriterToDataBase">
+		<property name="iPersonRepository" ref="IPersonRepository" />
+	</bean>
+	
+</beans>

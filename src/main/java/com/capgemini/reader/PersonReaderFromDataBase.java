@@ -6,7 +6,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.capgemini.dao.IPersonRepository;
-import com.capgemini.dao.Person;
+import com.capgemini.entity.Person;
 
 public class PersonReaderFromDataBase implements ItemReader<Person> {
 
@@ -26,5 +26,19 @@ public class PersonReaderFromDataBase implements ItemReader<Person> {
         }
 
         return this.cursor.next();
+    }
+
+    /**
+     * @return the iPersonRepository
+     */
+    public IPersonRepository getiPersonRepository() {
+        return iPersonRepository;
+    }
+
+    /**
+     * @param iPersonRepository the iPersonRepository to set
+     */
+    public void setiPersonRepository(IPersonRepository iPersonRepository) {
+        this.iPersonRepository = iPersonRepository;
     }
 }

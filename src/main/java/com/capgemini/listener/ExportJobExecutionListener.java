@@ -8,7 +8,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import com.capgemini.dao.Person;
+import com.capgemini.entity.Person;
 import com.capgemini.writer.PersonWriterToFile;
 
 @Component
@@ -24,15 +24,15 @@ public class ExportJobExecutionListener implements JobExecutionListener {
 
     public void beforeJob(JobExecution jobExecution) {
 
-        ((PersonWriterToFile) writer).initialize();
+        String filename = "csv/output/" + jobExecution.getJobParameters().getString("filename");
+
+        ((PersonWriterToFile) writer).initialize(filename);
 
         log.info("ExportWriter initialized");
     }
 
     public void afterJob(JobExecution jobExecution) {
-        String filename = jobExecution.getJobParameters().getString("filename");
-
-        ((PersonWriterToFile) writer).flush(filename);
+        ((PersonWriterToFile) writer).flush();
 
         log.info("ExportWriter flushed");
     }

@@ -14,6 +14,8 @@ import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,7 +27,7 @@ import com.capgemini.controller.exception.NotFoundException;
 import com.capgemini.job.report.ExecutionReport;
 
 @RestController
-public class PersonController {
+public class JobController {
 
     @Autowired
     JobLauncher jobLauncher;
@@ -44,10 +46,6 @@ public class PersonController {
     @Qualifier("exportUserJob")
     Job exportJob;
 
-    @Autowired
-    @Qualifier("importExportUserJob")
-    Job importExportJob;
-
     @RequestMapping(path = "/job/status", method = RequestMethod.GET)
     public ExecutionReport jobStatus(@RequestParam(value = "id") Long id) throws Exception {
 
@@ -60,13 +58,12 @@ public class PersonController {
         return ExecutionReport.createFromJobExecution(jobExecution);
     }
 
-    @RequestMapping(value = { "/person/import", "person/async/import",
-            "person/multithread/import" }, method = RequestMethod.GET)
+    @RequestMapping(value = { "/person/import", "person/async/import" }, method = RequestMethod.GET)
     public ExecutionReport runImport(HttpServletRequest request, @RequestParam String filename) throws Exception {
-        Boolean isAsync = request.getRequestURI().equals("/person/async/import");
-        Boolean isMultiThreading = request.getRequestURI().equals("/person/multithread/import");
 
-        File file = new File(filename);
+        Boolean isAsync = request.getRequestURI().equals("/person/async/import");
+
+        File file = new File("csv/input/" + filename);
 
         if (!file.exists() || file.isDirectory()) {
             throw new BadRequestException(String.format("File with name [%s] not found !", filename));
@@ -77,21 +74,15 @@ public class PersonController {
         }
 
         JobParameters parameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
-                .addString("filename", filename)
-                .addString("type", isMultiThreading ? "MULTI-THREADING" : (isAsync ? "ASYNC" : "NORMAL"))
-                .toJobParameters();
+                .addString("filename", filename).addString("type", isAsync ? "ASYNC" : "NORMAL").toJobParameters();
 
         JobExecution jobResult;
 
-        if (isAsync || isMultiThreading) {
+        if (isAsync) {
             SimpleJobLauncher simpleJobLauncher = new SimpleJobLauncher();
             simpleJobLauncher.setJobRepository(jobRepository);
 
             SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor("async_import_user");
-
-            if (isMultiThreading) {
-                simpleAsyncTaskExecutor.setConcurrencyLimit(10);
-            }
 
             simpleJobLauncher.setTaskExecutor(simpleAsyncTaskExecutor);
 
@@ -104,33 +95,26 @@ public class PersonController {
         return ExecutionReport.createFromJobExecution(jobResult);
     }
 
-    @RequestMapping(value = { "/person/export", "/person/async/export",
-            "/person/multithread/export" }, method = RequestMethod.GET)
+    @RequestMapping(value = { "/person/export", "/person/async/export" }, method = RequestMethod.GET)
     public ExecutionReport runExport(HttpServletRequest request, @RequestParam String filename) throws Exception {
 
         Boolean isAsync = request.getRequestURI().equals("/person/async/export");
-        Boolean isMultiThreading = request.getRequestURI().equals("/person/multithread/export");
 
         if (filename.length() < 6 || 0 != filename.substring(filename.length() - 5).toLowerCase().compareTo(".json")) {
             throw new BadRequestException(String.format("File with name [%s] not validate (not json) !", filename));
         }
 
         JobParameters parameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
-                .addString("filename", "sample-data.json")
-                .addString("type", isMultiThreading ? "MULTI-THREADING" : (isAsync ? "ASYNC" : "NORMAL"))
+                .addString("filename", "sample-data.json").addString("type", isAsync ? "ASYNC" : "NORMAL")
                 .toJobParameters();
 
         JobExecution jobResult;
 
-        if (isAsync || isMultiThreading) {
+        if (isAsync) {
             SimpleJobLauncher simpleJobLauncher = new SimpleJobLauncher();
             simpleJobLauncher.setJobRepository(jobRepository);
 
             SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor();
-
-            if (isMultiThreading) {
-                simpleAsyncTaskExecutor.setConcurrencyLimit(10);
-            }
 
             simpleJobLauncher.setTaskExecutor(simpleAsyncTaskExecutor);
 
@@ -144,9 +128,9 @@ public class PersonController {
     }
 
     @RequestMapping(value = { "/person/transform" }, method = RequestMethod.GET)
-    public ExecutionReport runImportExport(HttpServletRequest request, @RequestParam String filename) throws Exception {
+    public ExecutionReport runTransform(HttpServletRequest request, @RequestParam String filename) throws Exception {
 
-        File file = new File(filename);
+        File file = new File("csv/input/" + filename);
 
         if (!file.exists() || file.isDirectory()) {
             throw new BadRequestException(String.format("File with name [%s] not found !", filename));
@@ -156,18 +140,16 @@ public class PersonController {
             throw new BadRequestException(String.format("File with name [%s] not validate (not csv) !", filename));
         }
 
+        @SuppressWarnings("resource")
+        ApplicationContext context = new ClassPathXmlApplicationContext("config/job.xml");
+        JobLauncher asyncJobLauncher = (JobLauncher) context.getBean("asyncJobLauncher");
+
+        Job job = (Job) context.getBean("transformJob");
+
         JobParameters parameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
-                .addString("filename", filename).addString("type", "N").toJobParameters();
+                .addString("filename", filename).addString("type", "MULTI").toJobParameters();
 
-        SimpleJobLauncher simpleJobLauncher = new SimpleJobLauncher();
-        simpleJobLauncher.setJobRepository(jobRepository);
-
-        SimpleAsyncTaskExecutor simpleAsyncTaskExecutor = new SimpleAsyncTaskExecutor("async_import_export_user");
-
-        simpleAsyncTaskExecutor.setConcurrencyLimit(10);
-        simpleJobLauncher.setTaskExecutor(simpleAsyncTaskExecutor);
-
-        JobExecution jobResult = simpleJobLauncher.run(importExportJob, parameters);
+        JobExecution jobResult = asyncJobLauncher.run(job, parameters);
 
         return ExecutionReport.createFromJobExecution(jobResult);
     }

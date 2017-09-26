@@ -57,7 +57,6 @@
 								<div class="col-sm-12">
 									<button type="submit" class="btn btn-primary" name="run">Run</button>
 									<button type="submit" class="btn btn-success" name="runasync">Run Async</button>
-									<button type="submit" class="btn btn-warning" name="runmulti">Run Multi thread</button>
 								</div>
 							</div>
 						</form>
@@ -83,7 +82,6 @@
 								<div class="col-sm-12">
 									<button type="submit" class="btn btn-primary" name="run">Run</button>
 									<button type="submit" class="btn btn-success" name="runasync">Run Async</button>
-									<button type="submit" class="btn btn-warning" name="runmulti">Run Multi thread</button>
 								</div>
 							</div>
 						</form>
@@ -106,7 +104,7 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<div class="col-sm-offset-3 col-sm-9">
+								<div class="col-sm-12">
 									<button type="submit" class="btn btn-danger" name="runmulti">Run Async + Multi thread</button>
 								</div>
 							</div>
@@ -247,20 +245,22 @@
 			}
 		}
 		
-		$('form[name=importForm]').find('[name=run], [name=runasync], [name=runmulti]').click(function(){
+		$('form[name=importForm]').find('[name=run], [name=runasync]').click(function(){
 			var async = $(this).attr('name') == 'runasync', 
-				multi = $(this).attr('name') == 'runmulti', 
 				filename = $('input[name=sourcefilename]').val(),
 				panel = $(this).closest('div.panel'),
 				alert = panel.find('div.alert');
+			
 			alert.addClass('hide');
+			
 			if(filename == ''){
 				alert.find('span.error-message').text('Please provide a filename !')
 				alert.removeClass('hide');
 				return;
 			}
+			
 			$.ajax({
-				url: (multi ? '/person/multithread/import' : (async ? '/person/async/import' : '/person/import')),
+				url: (async ? '/person/async/import' : '/person/import'),
 				data : {'filename' : filename},
 				contentType: 'json',
 				beforeSend: function(){ panel.block({message: 'process'});},
@@ -278,24 +278,22 @@
 			return false;
 		});
 		
-		$('form[name=importForm], form[name=exportForm], form[name=importexportForm]').submit(function() {
-			return false;
-		});
-		
-		$('form[name=exportForm]').find('[name=run], [name=runasync], [name=runmulti]').click(function(){
+		$('form[name=exportForm]').find('[name=run], [name=runasync]').click(function(){
 			var async = $(this).attr('name') == 'runasync', 
-				multi = $(this).attr('name') == 'runmulti', 
 				filename = $('input[name=outputfilename]').val(),
 				panel = $(this).closest('div.panel'),
 				alert = panel.find('div.alert');
+			
 			alert.addClass('hide');
+			
 			if(filename == ''){
 				alert.find('span.error-message').text('Please provide a filename !')
 				alert.removeClass('hide');
 				return;
 			}
+			
 			$.ajax({
-				url: (multi ? '/person/multithread/export' : (async ? '/person/async/export' : '/person/export')),
+				url: (async ? '/person/async/export' : '/person/export'),
 				data : {'filename' : filename},
 				contentType: 'json',
 				beforeSend: function(){ panel.block({message: 'process'});},
@@ -317,12 +315,15 @@
 			var filename = $('input[name=sourceoutputfilename]').val(),
 				panel = $(this).closest('div.panel'),
 				alert = panel.find('div.alert');
+			
 			alert.addClass('hide');
+			
 			if(filename == ''){
 				alert.find('span.error-message').text('Please provide a filename !')
 				alert.removeClass('hide');
 				return;
 			}
+			
 			$.ajax({
 				url: '/person/transform',
 				data : {'filename' : filename},
@@ -339,6 +340,10 @@
 				complete: function(){ panel.unblock(); }
 			});
 			
+			return false;
+		});
+		
+		$('form[name=importForm], form[name=exportForm], form[name=importexportForm]').submit(function() {
 			return false;
 		});
 		

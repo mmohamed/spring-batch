@@ -11,12 +11,22 @@ import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.core.io.FileSystemResource;
 
-import com.capgemini.dao.Person;
+import com.capgemini.entity.Person;
 import com.capgemini.wrapper.PersonFieldSetMapper;
 
 public class PersonReaderFromFile implements ItemReader<Person> {
 
     private FlatFileItemReader<Person> reader = null;
+    private Boolean autoInitialized;
+
+    public PersonReaderFromFile() {
+        autoInitialized = false;
+    }
+
+    public PersonReaderFromFile(String filename) {
+        this.autoInitialized = true;
+        this.initialize(filename);
+    }
 
     public void initialize(String filename) {
         this.reader = new FlatFileItemReader<Person>();
@@ -40,13 +50,6 @@ public class PersonReaderFromFile implements ItemReader<Person> {
         reader.open(new ExecutionContext());
     }
 
-    public void destroy() throws Exception {
-        if (null != this.reader) {
-            reader.close();
-        }
-        reader = null;
-    }
-
     public Person read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
         if (null == reader) {
             throw new Exception("FileReader don't initialized !");
@@ -54,10 +57,18 @@ public class PersonReaderFromFile implements ItemReader<Person> {
 
         Person person = reader.read();
 
-        if (null == person) {
-            return null;
+        if (null == person && this.autoInitialized) {
+            this.destroy();
         }
 
         return person;
     }
+
+    public void destroy() throws Exception {
+        if (null != this.reader) {
+            reader.close();
+        }
+        reader = null;
+    }
+
 }

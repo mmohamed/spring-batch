@@ -3,7 +3,7 @@ package com.capgemini.processor;
 
 import org.springframework.batch.item.ItemProcessor;
 
-import com.capgemini.dao.Person;
+import com.capgemini.entity.Person;
 
 public class ExportPersonItemProcessor implements ItemProcessor<Person, Person> {
 

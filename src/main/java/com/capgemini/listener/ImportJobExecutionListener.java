@@ -8,7 +8,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import com.capgemini.dao.Person;
+import com.capgemini.entity.Person;
 import com.capgemini.reader.PersonReaderFromFile;
 
 @Component
@@ -23,7 +23,7 @@ public class ImportJobExecutionListener implements JobExecutionListener {
     }
 
     public void beforeJob(JobExecution jobExecution) {
-        String filename = jobExecution.getJobParameters().getString("filename");
+        String filename = "csv/input/" + jobExecution.getJobParameters().getString("filename");
 
         ((PersonReaderFromFile) reader).initialize(filename);
         log.info("ImportReader initialized");

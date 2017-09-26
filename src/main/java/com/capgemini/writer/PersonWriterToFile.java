@@ -14,27 +14,40 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemWriter;
 
+import com.capgemini.entity.Person;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.capgemini.dao.Person;
 
 public class PersonWriterToFile implements ItemWriter<Person> {
 
+    private String outputPath;
+    private Boolean autoInitialized;
+    private List<Person> collection;
+
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private List<Person> collection;
+    public PersonWriterToFile() {
+        collection = new ArrayList<Person>();
+        autoInitialized = true;
+    }
 
     public void write(List<? extends Person> items) throws Exception {
         for (Person person : items) {
             this.collection.add(person);
         }
+
+        if (autoInitialized) {
+            this.flush();
+        }
     }
 
-    public void initialize() {
+    public void initialize(String filename) {
+        autoInitialized = false;
         collection = new ArrayList<Person>();
+        outputPath = filename;
     }
 
-    public void flush(String filename) {
+    public void flush() {
         ObjectMapper mapper = new ObjectMapper();
 
         DateFormat df = new SimpleDateFormat("d/M/yyyy");
@@ -45,7 +58,7 @@ public class PersonWriterToFile implements ItemWriter<Person> {
         try {
             String jsonInString = mapper.writeValueAsString(collection);
 
-            Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename), "utf-8"));
+            Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.outputPath), "utf-8"));
             writer.write(jsonInString);
             writer.close();
         }
@@ -53,4 +66,19 @@ public class PersonWriterToFile implements ItemWriter<Person> {
             log.error("Can't print JSON file");
         }
     }
+
+    /**
+     * @return the outputPath
+     */
+    public String getOutputPath() {
+        return outputPath;
+    }
+
+    /**
+     * @param outputPath the outputPath to set
+     */
+    public void setOutputPath(String outputPath) {
+        this.outputPath = outputPath;
+    }
+
 }

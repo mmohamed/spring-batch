@@ -6,7 +6,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.capgemini.dao.IPersonRepository;
-import com.capgemini.dao.Person;
+import com.capgemini.entity.Person;
 
 public class PersonWriterToDataBase implements ItemWriter<Person> {
 
@@ -17,5 +17,19 @@ public class PersonWriterToDataBase implements ItemWriter<Person> {
         for (Person person : items) {
             iPersonRepository.save(person);
         }
+    }
+
+    /**
+     * @return the iPersonRepository
+     */
+    public IPersonRepository getiPersonRepository() {
+        return iPersonRepository;
+    }
+
+    /**
+     * @param iPersonRepository the iPersonRepository to set
+     */
+    public void setiPersonRepository(IPersonRepository iPersonRepository) {
+        this.iPersonRepository = iPersonRepository;
     }
 }

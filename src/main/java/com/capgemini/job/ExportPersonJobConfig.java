@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.capgemini.dao.Person;
+import com.capgemini.entity.Person;
 import com.capgemini.listener.ExportJobExecutionListener;
 import com.capgemini.processor.ExportPersonItemProcessor;
 import com.capgemini.reader.PersonReaderFromDataBase;
