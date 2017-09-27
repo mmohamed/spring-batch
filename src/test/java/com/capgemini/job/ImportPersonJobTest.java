@@ -81,6 +81,6 @@ public class ImportPersonJobTest {
         assertEquals(BatchStatus.COMPLETED, batchStatus);
         assertFalse(batchStatus.isUnsuccessful());
 
-        assertEquals(2000, personRepository.count());
+        assertEquals(1000, personRepository.count());
     }
 }

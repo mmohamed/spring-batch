@@ -59,7 +59,7 @@ public class ExportPersonJobTest {
         assertNotNull(failureExceptions);
         assertTrue(failureExceptions.isEmpty());
 
-        File file = new File("sample-data.json");
+        File file = new File("csv/output/sample-data.json");
 
         assertTrue(file.exists());
     }

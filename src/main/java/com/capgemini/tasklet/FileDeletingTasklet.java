@@ -28,7 +28,7 @@ public class FileDeletingTasklet implements Tasklet {
 
             int index = files[i].getName().lastIndexOf('.');
             if (index > 0) {
-                extension = files[index].getName().substring(index + 1);
+                extension = files[i].getName().substring(index + 1);
             }
 
             if (0 == extension.compareTo("csv")) {

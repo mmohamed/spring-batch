@@ -20,7 +20,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import com.capgemini.job.report.ExecutionReport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class PersonControllerTest extends AbstractControllerTest {
+public class JobControllerTest extends AbstractControllerTest {
 
     @MockBean
     JobLauncher jobLauncher;
