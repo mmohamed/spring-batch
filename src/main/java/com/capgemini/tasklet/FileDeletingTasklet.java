@@ -31,7 +31,7 @@ public class FileDeletingTasklet implements Tasklet {
                 extension = files[i].getName().substring(index + 1);
             }
 
-            if (0 == extension.compareTo("csv")) {
+            if (0 == extension.compareTo("csv") || 0 == extension.compareTo("json")) {
                 boolean deleted = files[i].delete();
                 if (!deleted) {
                     throw new UnexpectedJobExecutionException("Could not delete file " + files[i].getPath());

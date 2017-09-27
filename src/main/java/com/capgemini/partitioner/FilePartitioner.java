@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.item.ExecutionContext;
 
-public class BatchPartitioner implements Partitioner {
+public class FilePartitioner implements Partitioner {
 
     private Logger log = LoggerFactory.getLogger(this.getClass());
 

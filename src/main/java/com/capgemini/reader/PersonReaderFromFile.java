@@ -1,5 +1,8 @@
 package com.capgemini.reader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.NonTransientResourceException;
@@ -16,21 +19,27 @@ import com.capgemini.wrapper.PersonFieldSetMapper;
 
 public class PersonReaderFromFile implements ItemReader<Person> {
 
+    private Logger log = LoggerFactory.getLogger(getClass());
+
     private FlatFileItemReader<Person> reader = null;
+
     private Boolean autoInitialized;
+
+    private FileSystemResource file;
 
     public PersonReaderFromFile() {
         autoInitialized = false;
     }
 
     public PersonReaderFromFile(String filename) {
-        this.autoInitialized = true;
-        this.initialize(filename);
+        autoInitialized = true;
+        initialize(filename);
     }
 
     public void initialize(String filename) {
-        this.reader = new FlatFileItemReader<Person>();
-        this.reader.setResource(new FileSystemResource(filename));
+        reader = new FlatFileItemReader<Person>();
+        file = new FileSystemResource(filename);
+        reader.setResource(file);
 
         DefaultLineMapper<Person> lineMapper = new DefaultLineMapper<Person>();
 
@@ -57,15 +66,23 @@ public class PersonReaderFromFile implements ItemReader<Person> {
 
         Person person = reader.read();
 
-        if (null == person && this.autoInitialized) {
-            this.destroy();
+        if (null == person && autoInitialized) {
+            destroy();
+            // and delete file
+            boolean deleted = file.getFile().delete();
+            if (!deleted) {
+                throw new UnexpectedJobExecutionException("Could not delete file " + file.getPath());
+            }
+            else {
+                log.info(file.getFile() + " readed and deleted!");
+            }
         }
 
         return person;
     }
 
     public void destroy() throws Exception {
-        if (null != this.reader) {
+        if (null != reader) {
             reader.close();
         }
         reader = null;
