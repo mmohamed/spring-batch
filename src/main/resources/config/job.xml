@@ -71,9 +71,7 @@
 		<property name="input" value="file:csv/input/#{jobParameters[filename]}" />
 	</bean>
 
-	<bean id="cleanDBTasklet" class="com.capgemini.tasklet.CleanDBTasklet">
-		<property name="iPersonRepository" ref="IPersonRepository" />
-	</bean>
+	<bean id="cleanDBTasklet" class="com.capgemini.tasklet.CleanDBTasklet" />
 
 	<bean id="fileDeletingTasklet" class="com.capgemini.tasklet.FileDeletingTasklet">
 		<property name="directory" value="file:csv/chunked/" />
