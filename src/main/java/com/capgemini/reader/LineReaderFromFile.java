@@ -13,16 +13,10 @@ public class LineReaderFromFile implements ItemReader<String> {
     private String inputPath;
     private BufferedReader reader = null;
 
-    /**
-     * @return the inputPath
-     */
     public String getInputPath() {
         return inputPath;
     }
 
-    /**
-     * @param inputPath the inputPath to set
-     */
     public void setInputPath(String inputPath) {
         this.inputPath = inputPath;
     }

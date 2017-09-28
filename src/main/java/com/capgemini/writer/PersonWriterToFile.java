@@ -67,18 +67,11 @@ public class PersonWriterToFile implements ItemWriter<Person> {
         }
     }
 
-    /**
-     * @return the outputPath
-     */
     public String getOutputPath() {
         return outputPath;
     }
 
-    /**
-     * @param outputPath the outputPath to set
-     */
     public void setOutputPath(String outputPath) {
         this.outputPath = outputPath;
     }
-
 }

@@ -20,15 +20,6 @@ public class ExecutionReport {
     private Double timer;
     private String type;
 
-    /**
-     * Default Constructor.
-     * 
-     * @param id
-     * @param status
-     * @param startTime
-     * @param endTime
-     * @param type
-     */
     public ExecutionReport(JobInstanceReport jobInstanceReport, Long id, BatchStatus status, Date startTime,
             Date endTime, String type) {
         this.jobInstanceReport = jobInstanceReport;
@@ -57,114 +48,66 @@ public class ExecutionReport {
                 type);
     }
 
-    /**
-     * @return the id
-     */
     public Long getId() {
         return id;
     }
 
-    /**
-     * @param id the id to set
-     */
     public void setId(Long id) {
         this.id = id;
     }
 
-    /**
-     * @return the status
-     */
     public String getStatus() {
         return status;
     }
 
-    /**
-     * @param status the status to set
-     */
     public void setStatus(String status) {
         this.status = status;
     }
 
-    /**
-     * @return the startedAt
-     */
     public Date getStartedAt() {
         return startedAt;
     }
 
-    /**
-     * @param startedAt the startedAt to set
-     */
     public void setStartedAt(Date startedAt) {
         this.startedAt = startedAt;
     }
 
-    /**
-     * @return the finishedAt
-     */
     public Date getFinishedAt() {
         return finishedAt;
     }
 
-    /**
-     * @param finishedAt the finishedAt to set
-     */
     public void setFinishedAt(Date finishedAt) {
         this.finishedAt = finishedAt;
     }
 
-    /**
-     * @return the JobInstanceReport
-     */
     public JobInstanceReport getJobInstanceReport() {
         return jobInstanceReport;
     }
 
-    /**
-     * @param jobInstanceReport the JobInstanceReport to set
-     */
     public void setJobInstanceReport(JobInstanceReport JobInstanceReport) {
         this.jobInstanceReport = JobInstanceReport;
     }
 
-    /**
-     * @return the isRunning
-     */
     public Boolean isRunning() {
         return isRunning;
     }
 
-    /**
-     * @param isRunning the isRunning to set
-     */
     public void setIsRunning(Boolean isRunning) {
         this.isRunning = isRunning;
     }
 
-    /**
-     * @return the timer
-     */
     public Double getTimer() {
         return timer;
     }
 
-    /**
-     * @param timer the timer to set
-     */
     public void setTimer(Double timer) {
         this.timer = timer;
     }
 
-    /**
-     * @return the type
-     */
     public String getType() {
         return type;
     }
 
-    /**
-     * @param type the type to set
-     */
     public void setType(String type) {
         this.type = type;
     }

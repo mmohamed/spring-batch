@@ -23,18 +23,16 @@
 			<nav>
 				<ul class="nav nav-justified">
 					<li class="active"><a href="#">Home</a></li>
-					<li><a href="#">Projects</a></li>
-					<li><a href="#">Services</a></li>
-					<li><a href="#">Downloads</a></li>
-					<li><a href="#">About</a></li>
-					<li><a href="#">Contact</a></li>
+					<li><a href="http://projects.spring.io/spring-boot/" target="_blank">Spring Boot</a></li>
+					<li><a href="http://projects.spring.io/spring-batch/" target="_blank">Spring Batch</a></li>
+					<li><a href="http://projects.spring.io/spring-webflow/" target="_blank">Spring WebFlow</a></li>
 				</ul>
 			</nav>
 		</div>
 
 		<div class="jumbotron">
 			<h1>Spring Batch Jobs!</h1>
-			<p class="lead">Available files for import [sample-data.csv , sample-data-big.csv] and for export [sample-data.json].</p>
+			<p class="lead">Some examples for import CSV files to DataBase , export from DataBase to JSON file and import with export on same job (multithreaded).</p>
 		</div>
 
 		<div class="row">
@@ -48,9 +46,14 @@
 						<div class="alert alert-danger hide" role="alert"><strong>Error !</strong><span class="error-message"></span> </div>
 						<form class="form-horizontal" name="importForm">
 							<div class="form-group">
-								<label class="control-label col-sm-5" for="file">Source filename (*.csv)</label>
-								<div class="col-sm-7">
-									<input type="text" class="form-control" id="file" name="sourcefilename">
+								<label class="control-label col-sm-3" for="file">Source</label>
+								<div class="col-sm-9">
+									<select id="file" name="sourcefilename" class="form-control">
+										<option value="" selected> Choice input !</option>
+										<option value="sample-data.csv">Small (1000 lines)</option>
+										<option value="sample-data-medium.csv">Medium (10 000 lines)</option>
+										<option value="sample-data-big.csv">Big (200 000 lines)</option>
+									</select>
 								</div>
 							</div>
 							<div class="form-group">
@@ -73,7 +76,7 @@
 						<div class="alert alert-danger hide" role="alert"><strong>Error !</strong><span class="error-message"></span> </div>
 						<form class="form-horizontal" name="exportForm">
 							<div class="form-group">
-								<label class="control-label col-sm-5" for="file">Output filename (*.json)</label>
+								<label class="control-label col-sm-5" for="file">Output (*.json)</label>
 								<div class="col-sm-7">
 									<input type="text" class="form-control" id="file" name="outputfilename">
 								</div>
@@ -98,9 +101,14 @@
 						<div class="alert alert-danger hide" role="alert"><strong>Error !</strong><span class="error-message"></span> </div>
 						<form class="form-horizontal" name="importExportForm">
 							<div class="form-group">
-								<label class="control-label col-sm-5" for="file">Source filename (*.csv)</label>
-								<div class="col-sm-7">
-									<input type="text" class="form-control" id="file" name="sourceoutputfilename">
+								<label class="control-label col-sm-3" for="file">Source</label>
+								<div class="col-sm-9">
+									<select id="file" name="sourceoutputfilename" class="form-control">
+										<option value="" selected> Choice input !</option>
+										<option value="sample-data.csv">Small (1000 lines)</option>
+										<option value="sample-data-medium.csv">Medium (10 000 lines)</option>
+										<option value="sample-data-big.csv">Big (200 000 lines)</option>
+									</select>
 								</div>
 							</div>
 							<div class="form-group">
@@ -150,7 +158,7 @@
 	<script src="https://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
 	<script src="http://malsup.github.io/jquery.blockUI.js"></script>
 	
-	<script type="text/javascript">
+	<script type="text/javascript" th:inline="javascript">
 	$(document).ready(function() {
 		
 		$.getJobStatusJob = function(jobExecutionId){
@@ -165,7 +173,7 @@
 					$.updateJobView(data);
 				},
 				error: function(data){ 
-					setTimeout(function(){ $.getJobStatusJob(jobExecutionId) }, 3000);		
+					setTimeout(function(){ $.getJobStatusJob(jobExecutionId) }, 2000);		
 				},
 				complete: function(){ panel.unblock(); }
 			});
@@ -225,7 +233,7 @@
 			}
 			
 			if(jobData.running){
-				setTimeout(function(){ $.getJobStatusJob(jobData.id); }, 3000);
+				setTimeout(function(){ $.getJobStatusJob(jobData.id); }, 2000);
 			}
 			
 			$('html, body').animate({
@@ -240,14 +248,14 @@
 			panel.find('span.started-at').text(jobData.startedAt == null ? '--/--/-- --:--:--' : jobData.startedAt);
 			panel.find('span.timer').text(jobData.timer);
 			if(jobData.running){
-				setTimeout(function(){ $.getJobStatusJob(jobData.id) }, 3000);
+				setTimeout(function(){ $.getJobStatusJob(jobData.id) }, 2000);
 				return;
 			}
 		}
 		
 		$('form[name=importForm]').find('[name=run], [name=runasync]').click(function(){
 			var async = $(this).attr('name') == 'runasync', 
-				filename = $('input[name=sourcefilename]').val(),
+				filename = $('select[name=sourcefilename]').val(),
 				panel = $(this).closest('div.panel'),
 				alert = panel.find('div.alert');
 			
@@ -265,7 +273,7 @@
 				contentType: 'json',
 				beforeSend: function(){ panel.block({message: 'process'});},
 				success: function(data){
-					$('input[name=sourcefilename]').val('');
+					$('select[name=sourcefilename]').val('');
 					$.addJobView(data, 0);
 				},
 				error: function(data){ 
@@ -312,7 +320,7 @@
 		});
 		
 		$('form[name=importExportForm]').find('[name=runmulti]').click(function(){
-			var filename = $('input[name=sourceoutputfilename]').val(),
+			var filename = $('select[name=sourceoutputfilename]').val(),
 				panel = $(this).closest('div.panel'),
 				alert = panel.find('div.alert');
 			
@@ -330,7 +338,7 @@
 				contentType: 'json',
 				beforeSend: function(){ panel.block({message: 'process'});},
 				success: function(data){
-					$('input[name=sourceoutputfilename]').val('');
+					$('select[name=sourceoutputfilename]').val('');
 					$.addJobView(data, 2);
 				},
 				error: function(data){ 
@@ -343,10 +351,25 @@
 			return false;
 		});
 		
-		$('form[name=importForm], form[name=exportForm], form[name=importexportForm]').submit(function() {
+		$('form[name=importForm], form[name=exportForm], form[name=importExportForm]').submit(function() {
 			return false;
 		});
 		
+		 /*<![CDATA[*/
+        var jobs = $.parseJSON(/*[[${jobExecutionsJSON}]]*/'{}');
+        /*]]>*/
+        
+        if(jobs.length != 0){
+        	for(var i=0; i < jobs.importUserJob.length; i++){
+        		$.addJobView(jobs.importUserJob[i], 0);
+        	}
+        	for(var i=0; i < jobs.exportUserJob.length; i++){
+        		$.addJobView(jobs.exportUserJob[i], 1);
+        	}
+        	for(var i=0; i < jobs.transformJob.length; i++){
+        		$.addJobView(jobs.transformJob[i], 2);
+        	}
+        }
 	});
 	</script>
 </body>

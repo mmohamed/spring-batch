@@ -43,18 +43,11 @@ public class CountingTasklet implements Tasklet, InitializingBean {
         return RepeatStatus.FINISHED;
     }
 
-    /**
-     * @return the input
-     */
     public Resource getInput() {
         return input;
     }
 
-    /**
-     * @param input the input to set
-     */
     public void setInput(Resource input) {
         this.input = input;
     }
-
 }

@@ -10,16 +10,10 @@ public class LineWriterToFile implements ItemWriter<String> {
 
     private String outputPath;
 
-    /**
-     * @return the outputPath
-     */
     public String getOutputPath() {
         return outputPath;
     }
 
-    /**
-     * @param outputPath the outputPath to set
-     */
     public void setOutputPath(String outputPath) {
         this.outputPath = outputPath;
     }

@@ -32,16 +32,10 @@ public class PersonWriterToDataBase implements ItemWriter<Person> {
         }
     }
 
-    /**
-     * @return the iPersonRepository
-     */
     public IPersonRepository getiPersonRepository() {
         return iPersonRepository;
     }
 
-    /**
-     * @param iPersonRepository the iPersonRepository to set
-     */
     public void setiPersonRepository(IPersonRepository iPersonRepository) {
         this.iPersonRepository = iPersonRepository;
     }

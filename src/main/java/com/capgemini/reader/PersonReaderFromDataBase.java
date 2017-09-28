@@ -48,44 +48,26 @@ public class PersonReaderFromDataBase implements ItemReader<Person> {
         }
     }
 
-    /**
-     * @return the iPersonRepository
-     */
     public IPersonRepository getiPersonRepository() {
         return iPersonRepository;
     }
 
-    /**
-     * @param iPersonRepository the iPersonRepository to set
-     */
     public void setiPersonRepository(IPersonRepository iPersonRepository) {
         this.iPersonRepository = iPersonRepository;
     }
 
-    /**
-     * @return the page
-     */
     public Integer getPage() {
         return page;
     }
 
-    /**
-     * @param page the page to set
-     */
     public void setPage(Integer page) {
         this.page = page;
     }
 
-    /**
-     * @return the size
-     */
     public Integer getSize() {
         return size;
     }
 
-    /**
-     * @param size the size to set
-     */
     public void setSize(Integer size) {
         this.size = size;
     }
