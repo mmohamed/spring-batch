@@ -10,6 +10,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
@@ -21,13 +24,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.RestTemplate;
 
 import com.capgemini.dao.IPersonRepository;
 import com.capgemini.main.Application;
+import com.capgemini.processor.ImportPersonItemProcessor;
+import com.capgemini.tax.Tax;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 public class ImportPersonJobTest {
+
+    @Mock
+    RestTemplate restTemplate;
+
+    @Autowired
+    ImportPersonItemProcessor importPersonItemProcessor;
 
     @Autowired
     private IPersonRepository personRepository;
@@ -41,7 +53,16 @@ public class ImportPersonJobTest {
 
     @Before
     public void setUp() {
+
         personRepository.deleteAll();
+
+        Tax tax = new Tax();
+        tax.setValue(10000L);
+
+        Mockito.when(restTemplate.postForObject(Matchers.matches("http://localhost:8080/tax/calculate"),
+                Matchers.isA(Tax.class), Matchers.eq(Tax.class))).thenReturn(tax);
+
+        importPersonItemProcessor.setRestTemplate(restTemplate);
     }
 
     @Test

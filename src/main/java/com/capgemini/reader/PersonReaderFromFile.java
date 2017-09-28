@@ -46,7 +46,8 @@ public class PersonReaderFromFile implements ItemReader<Person> {
         DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
         lineTokenizer.setDelimiter(",");
         lineTokenizer.setStrict(false);
-        lineTokenizer.setNames(new String[] { "reference", "firstName", "lastName", "registrationDate" });
+        lineTokenizer
+                .setNames(new String[] { "registrationNumber", "firstName", "lastName", "salary", "registrationDate" });
 
         BeanWrapperFieldSetMapper<Person> fieldSetMapper = new BeanWrapperFieldSetMapper<Person>();
         fieldSetMapper.setTargetType(Person.class);

@@ -20,14 +20,17 @@ public class PersonFieldSetMapper implements FieldSetMapper<Person> {
 
         person.setFirstName(fieldSet.readString("firstName"));
         person.setLastName(fieldSet.readString("lastName"));
-        person.setReference(fieldSet.readString("reference"));
+        person.setRegistrationNumber(fieldSet.readString("registrationNumber"));
+        person.setSalary(Long.valueOf(fieldSet.readString("salary")));
 
         String registrationDate = fieldSet.readString("registrationDate");
 
         if (!registrationDate.isEmpty()) {
+
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/y", Locale.FRANCE);
             LocalDate localDate = LocalDate.parse(registrationDate, formatter);
             Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
             person.setRegistredAt(date);
         }
 

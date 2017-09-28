@@ -7,7 +7,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@ComponentScan(basePackages = { "com.capgemini.job", "com.capgemini.controller", "com.capgemini.listener" })
+@ComponentScan(basePackages = { "com.capgemini.job", "com.capgemini.controller", "com.capgemini.listener",
+        "com.capgemini.tax" })
 @EnableJpaRepositories("com.capgemini.dao")
 @EntityScan("com.capgemini.entity")
 public class Application {
