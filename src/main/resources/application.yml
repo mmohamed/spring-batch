@@ -12,3 +12,4 @@ spring:
     batch:
         job.enabled: false
         initializer.enabled: true
+      

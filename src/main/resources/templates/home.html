@@ -33,8 +33,15 @@
 		<div class="jumbotron">
 			<h1>Spring Batch Jobs!</h1>
 			<p class="lead">Some examples for import CSV files to DataBase , export from DataBase to JSON file and import with export on same job (multithreaded).</p>
+			<p>
+				<button class="btn btn-success" type="button" data-toggle="collapse" data-target="#diagramme" aria-expanded="false" aria-controls="diagramme">
+			    View diagramme
+			  	</button>
+			 </p>
 		</div>
 
+		<div th:replace="fragments/diagramme :: diagramme">...</div>
+		
 		<div class="row">
 			
 			<div class="col-lg-4">
@@ -121,9 +128,9 @@
 				</div>
 			</div>
 		</div>
-	
+		
 		<footer class="footer">
-			<p>&copy; 2017 MedInvention.</p>
+			<p>&copy; 2017 Capgemini.</p>
 		</footer>
 
 	</div>
@@ -185,7 +192,7 @@
 			
 			replaceData = {pattern : ['{{jobid}}', '{{jobname}}', '{{status}}', '{{executionid}}', '{{startedat}}', '{{finishedat}}', '{{instanceid}}', '{{timer}}', '{{type}}'], 
 					replace : [jobData.jobInstanceReport.id, jobData.jobInstanceReport.jobName, jobData.status, jobData.id, jobData.startedAt, 
-						jobData.finishedAt, jobData.jobInstanceReport.instanceId, jobData.timer, jobData.type]}
+						jobData.finishedAt, jobData.jobInstanceReport.instanceId, $.parseTimer(jobData.timer), jobData.type]}
 			for(var i=0;i<replaceData.pattern.length;i++){
 				newJobContent = newJobContent.replace(RegExp(replaceData.pattern[i], 'g'), replaceData.replace[i] == null ? '--/--/-- --:--:--' : replaceData.replace[i]);
 			}
@@ -246,11 +253,17 @@
 			panel.find('span.badge').text(jobData.status);
 			panel.find('span.finished-at').text(jobData.finishedAt == null ? '--/--/-- --:--:--' : jobData.finishedAt);
 			panel.find('span.started-at').text(jobData.startedAt == null ? '--/--/-- --:--:--' : jobData.startedAt);
-			panel.find('span.timer').text(jobData.timer);
+			panel.find('span.timer').text($.parseTimer(jobData.timer));
 			if(jobData.running){
 				setTimeout(function(){ $.getJobStatusJob(jobData.id) }, 2000);
 				return;
 			}
+		}
+		
+		$.parseTimer = function(timer){
+			var minutes = Math.floor(timer / 60),
+				seconds = Math.floor(timer - (minutes * 60));	
+			return (minutes > 9 ? minutes : ('0'+minutes))+':'+(seconds > 9 ? seconds : ('0'+seconds));
 		}
 		
 		$('form[name=importForm]').find('[name=run], [name=runasync]').click(function(){
