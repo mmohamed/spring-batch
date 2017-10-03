@@ -1,3 +1,5 @@
+SET foreign_key_checks = 0;
+
 DROP TABLE IF EXISTS batch_job_execution ;
 DROP TABLE IF EXISTS batch_job_execution_context ;
 DROP TABLE IF EXISTS batch_job_execution_params ;
@@ -19,3 +21,5 @@ CREATE TABLE person  (
     registration_number VARCHAR(20) NOT NULL,
     registred_at DATE NOT NULL
 );
+
+SET foreign_key_checks = 1;
