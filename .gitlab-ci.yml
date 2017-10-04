@@ -1,8 +1,9 @@
 before_script:
+  - echo "deb http://ftp.de.debian.org/debian jessie-backports main" >> /etc/apt/sources.list
   - apt-get -qq update
   - DEBIAN_FRONTEND=noninteractive apt-get install -y -qq mysql-server 
   - apt-get install -y -qq maven
-  - apt-get install -y -qq openjdk-7-jdk
+  - apt-get install -y -qq openjdk-8-jdk
   - /etc/init.d/mysql restart
   - mysql -hlocalhost -P3306 -uroot -e"CREATE DATABASE batch_test"
   - mysql -hlocalhost -P3306 -uroot -e"CREATE USER batch"
