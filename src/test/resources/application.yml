@@ -3,8 +3,8 @@ spring:
         hibernate.ddl-auto: none
     datasource:
         url: 'jdbc:mysql://localhost:3306/batch_test'
-        username: 'root'  
-        password: 'root'
+        username: 'batch'  
+        password: 'batch'
     thymeleaf:
         mode: LEGACYHTML5  
         cache: false  
