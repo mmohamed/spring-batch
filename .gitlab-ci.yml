@@ -1,10 +1,9 @@
 before_script:
-  - apt-get -qq update 
-  - apt-get install -y -qq openjdk-8-jdk
+  - apt-get -qq update
   - DEBIAN_FRONTEND=noninteractive apt-get install -y -qq mysql-server 
   - apt-get install -y -qq maven
   - /etc/init.d/mysql restart
-  - maven -version
+  - mvn -version
   - java -version
   - javac -version
   - mysql -hlocalhost -P3306 -uroot -e"CREATE DATABASE batch_test"
