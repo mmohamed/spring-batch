@@ -3,18 +3,14 @@ before_script:
   - DEBIAN_FRONTEND=noninteractive apt-get install -y -qq mysql-server 
   - apt-get install -y -qq maven
   - apt-get install -y -qq openjdk-7-jdk
-  - update-alternatives --config java
-  - javac -version
   - /etc/init.d/mysql restart
-  - mvn -version
-  - java -version
   - mysql -hlocalhost -P3306 -uroot -e"CREATE DATABASE batch_test"
   - mysql -hlocalhost -P3306 -uroot -e"CREATE USER batch"
   - mysql -hlocalhost -P3306 -uroot -e"GRANT ALL ON batch.* to 'batch'@'localhost' identified by 'batch'"
   
 test:
   script:
-    - mvn test
+    - mvn --batch-mode test
 
 #build:
 #  script:
