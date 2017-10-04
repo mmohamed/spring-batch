@@ -1,0 +1,13 @@
+before_script:
+  - apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq mysql-server &&  apt-get install -y -qq maven
+  - mysql -h127.0.0.1 -P3306 -uroot -e"CREATE DATABASE batch_test"
+  - mysql -h127.0.0.1 -P3306 -uroot -e"CREATE USER batch"
+  - mysql -h127.0.0.1 -P3306 -uroot -e"GRANT ALL ON batch.* to 'batch'@'localhost' identified by 'batch'"
+  
+test:
+  script:
+    - mvn test
+
+build:
+  script:
+    - mvn clean package -Dmaven.test.skip=true
