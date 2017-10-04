@@ -6,8 +6,8 @@ before_script:
   - apt-get install -y -qq maven
   - /etc/init.d/mysql restart
   - mysql -hlocalhost -P3306 -uroot -e"CREATE DATABASE batch_test"
-  - mysql -hlocalhost -P3306 -uroot -e"CREATE USER batch"
-  - mysql -hlocalhost -P3306 -uroot -e"GRANT ALL ON batch.* to 'batch'@'localhost' identified by 'batch'"
+  - mysql -hlocalhost -P3306 -uroot -e"CREATE USER 'batch'@'localhost' IDENTIFIED BY 'batch'"
+  - mysql -hlocalhost -P3306 -uroot -e"GRANT ALL ON batch_test.* TO 'batch'@'localhost'"
   
 test:
   script:
