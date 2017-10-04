@@ -1,7 +1,7 @@
+image: openjdk:8
+
 before_script:
-  - echo "deb http://ftp.de.debian.org/debian jessie-backports main" >> /etc/apt/sources.list
   - apt-get -qq update
-  - apt-get install -y -f -qq openjdk-8-jdk
   - DEBIAN_FRONTEND=noninteractive apt-get install -y -qq mysql-server 
   - apt-get install -y -qq maven
   - /etc/init.d/mysql restart
