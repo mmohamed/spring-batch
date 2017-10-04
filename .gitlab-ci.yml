@@ -2,6 +2,7 @@ before_script:
   - apt-get -qq update
   - DEBIAN_FRONTEND=noninteractive apt-get install -y -qq mysql-server 
   - apt-get install -y -qq maven
+  - apt-get install -y -qq openjdk-7-jdk
   - update-alternatives --config java
   - javac -version
   - /etc/init.d/mysql restart
