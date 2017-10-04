@@ -1,7 +1,12 @@
 before_script:
-  - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-server &&  apt-get install -y maven
+  - apt-get -qq update 
+  - apt-get install -y -qq openjdk-8-jdk
+  - DEBIAN_FRONTEND=noninteractive apt-get install -y -qq mysql-server 
+  - apt-get install -y -qq maven
   - /etc/init.d/mysql restart
-  - cat /etc/mysql/my.cnf
+  - maven -version
+  - java -version
+  - javac -version
   - mysql -hlocalhost -P3306 -uroot -e"CREATE DATABASE batch_test"
   - mysql -hlocalhost -P3306 -uroot -e"CREATE USER batch"
   - mysql -hlocalhost -P3306 -uroot -e"GRANT ALL ON batch.* to 'batch'@'localhost' identified by 'batch'"
