@@ -7,7 +7,6 @@ before_script:
   - /etc/init.d/mysql restart
   - mvn -version
   - java -version
-  - javac -version
   - mysql -hlocalhost -P3306 -uroot -e"CREATE DATABASE batch_test"
   - mysql -hlocalhost -P3306 -uroot -e"CREATE USER batch"
   - mysql -hlocalhost -P3306 -uroot -e"GRANT ALL ON batch.* to 'batch'@'localhost' identified by 'batch'"
