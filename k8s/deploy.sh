@@ -47,7 +47,7 @@ if [ $? != 0 ]; then
 	# create new deploy
 	sed -i "s|{{crt}}|`echo $CRT`|g" app.yaml
 	sed -i "s|{{key}}|`echo $KEY`|g" app.yaml
-	sed -i "s|{{host}}/springbatch.medinvention.dev/g" app.yaml
+	sed -i "s|{{host}}|springbatch.medinvention.dev|g" app.yaml
 	sed -i "s|{{commit}}|`echo $commitID`|g" app.yaml
 
 	./kubectl --token=$TOKEN apply -f app.yaml
