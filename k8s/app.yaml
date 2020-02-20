@@ -60,40 +60,40 @@ spec:
         commit: {{commit}}
     spec:
       containers:
-      - name: springbatch
-        image: medinvention/spring-batch:arm
-        imagePullPolicy: Always
-        env:
-        - name: DB_USER
-          valueFrom:
-            secretKeyRef:
-              name: mysqlsecret
-              key: username
-        - name: DB_PASS
-          valueFrom:
-            secretKeyRef:
-              name: mysqlsecret
-              key: password
-        - name: DB_URL
-          value: mysql.springbatch.svc.cluster.local:3306/batch
-        ports:
-        - containerPort: 8080
-        readinessProbe:
-          httpGet:
-            path: /actuator/health
-            port: 8080
-          initialDelaySeconds: 10
-          timeoutSeconds: 2
-          periodSeconds: 3
-          failureThreshold: 1
-        livenessProbe:
-          httpGet:
-            path: /actuator/health
-            port: 8080
-          initialDelaySeconds: 20
-          timeoutSeconds: 2
-          periodSeconds: 8
-          failureThreshold: 1
+        - name: springbatch
+          image: medinvention/spring-batch:arm
+          imagePullPolicy: Always
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysqlsecret
+                  key: username
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mysqlsecret
+                  key: password
+            - name: DB_URL
+              value: mysql.springbatch.svc.cluster.local:3306/batch
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+            periodSeconds: 3
+            failureThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 20
+            timeoutSeconds: 2
+            periodSeconds: 8
+            failureThreshold: 1
 ---
 apiVersion: v1
 kind: Service
