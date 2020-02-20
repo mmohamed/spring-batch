@@ -10,6 +10,10 @@ if [ -z "$TOKEN" ]; then
 	exit 1
 fi
 
+echo "Get Kubectl"
+curl -s -LO https://storage.googleapis.com/kubernetes-release/release/v1.17.0/bin/linux/arm/kubectl
+chmod +x ./kubectl
+
 commitID=$(git rev-parse --short HEAD)
 
 if [ $? != 0 ] || [ -z "$commitID" ]; then
@@ -19,10 +23,10 @@ fi
 
 echo "Deploy for CommitID : ${commitID}"
 
-bddep=$(kubectl --token=$TOKEN get deployment mysql -n springbatch)
+bddep=$(./kubectl --token=$TOKEN get deployment mysql -n springbatch)
 if [ $? != 0 ]; then
 	# create new deploy
-	kubectl --token=$TOKEN apply -f mysql.yaml
+	./kubectl --token=$TOKEN apply -f mysql.yaml
 	if [ $? != 0 ]; then
 		echo "Unable to deploy database !"
 		exit 1
@@ -31,14 +35,14 @@ fi
 
 # wait for ready
 attempts=0
-rolloutStatusCmd="kubectl --token=$TOKEN rollout status deployment/mysql -n springbatch"
+rolloutStatusCmd="./kubectl --token=$TOKEN rollout status deployment/mysql -n springbatch"
 until $rolloutStatusCmd || [ $attempts -eq 60 ]; do
   $rolloutStatusCmd
   attempts=$((attempts + 1))
   sleep 10
 done
 
-appdep=$(kubectl --token=$TOKEN get deployment springbatch -n springbatch)
+appdep=$(./kubectl --token=$TOKEN get deployment springbatch -n springbatch)
 if [ $? != 0 ]; then
 	# create new deploy
 	sed -i "s|{{crt}}|`echo $CRT`|g" app.yaml
@@ -46,14 +50,14 @@ if [ $? != 0 ]; then
 	sed -i "s|{{host}}/springbatch.medinvention.dev/g" app.yaml
 	sed -i "s|{{commit}}|`echo $commitID`|g" app.yaml
 
-	kubectl --token=$TOKEN apply -f app.yaml
+	./kubectl --token=$TOKEN apply -f app.yaml
 	if [ $? != 0 ]; then
 		echo "Unable to deploy application !"
 		exit 1
 	fi	
 else
 	# patch it
-	kubectl --token=$TOKEN patch deployment springbatch -n springbatch -p "{"spec":{"template":{"metadata":{"labels":{"commit":"$commitID"}}}}}"
+	./kubectl --token=$TOKEN patch deployment springbatch -n springbatch -p "{"spec":{"template":{"metadata":{"labels":{"commit":"$commitID"}}}}}"
 	if [ $? != 0 ]; then
 		echo "Unable to patch application deploy !"
 		exit 1
@@ -62,7 +66,7 @@ fi
 
 # wait for ready
 attempts=0
-rolloutStatusCmd="kubectl --token=$TOKEN rollout status deployment/springbatch -n springbatch"
+rolloutStatusCmd="./kubectl --token=$TOKEN rollout status deployment/springbatch -n springbatch"
 until $rolloutStatusCmd || [ $attempts -eq 60 ]; do
   $rolloutStatusCmd
   attempts=$((attempts + 1))
