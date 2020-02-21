@@ -1,4 +1,4 @@
-TRUNCATE person;
+TRUNCATE TABLE person;
 INSERT INTO person (id, first_name, last_name, salary, tax, registration_number, registred_at) VALUES
 (1, 'LYNA', 'JOLY', 76000, 19000, 'REF00000000000000000', '2017-09-28'),
 (2, 'EMMA', 'DUCHATEAU', 35000, 8750, 'REF00000000000000001', '2017-10-04'),

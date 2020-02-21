@@ -23,6 +23,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
@@ -38,6 +39,9 @@ public class TransformPersonJobTest {
 
     @Mock
     RestTemplate restTemplate;
+
+    @Autowired
+    private IPersonRepository personRepository;
 
     @Test
     public void launchJob() throws Exception {
@@ -62,8 +66,6 @@ public class TransformPersonJobTest {
 
         JobParameters parameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
                 .addString("filename", "sample-data.csv").toJobParameters();
-
-        IPersonRepository personRepository = (IPersonRepository) context.getBean("IPersonRepository");
 
         personRepository.deleteAll();
 
