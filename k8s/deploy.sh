@@ -14,7 +14,7 @@ echo "Get Kubectl"
 curl -s -LO https://storage.googleapis.com/kubernetes-release/release/v1.17.0/bin/linux/arm/kubectl
 chmod +x ./kubectl
 
-commitID=$(git rev-parse --short HEAD)
+commitID=$(git log -1 --pretty="%H")
 
 if [ $? != 0 ] || [ -z "$commitID" ]; then
 	echo "Unable to determinate CommitID !"
@@ -30,7 +30,7 @@ if [ $? != 0 ]; then
 	if [ $? != 0 ]; then
 		echo "Unable to deploy database !"
 		exit 1
-	fi	
+	fi
 fi
 
 # wait for ready
