@@ -12,9 +12,9 @@ metadata:
   namespace: springbatch
 type: Opaque
 data:
-  rootpassword: cm9vdAo= # root
-  username: c3ByaW5nCg== # spring
-  password: c3ByaW5nCg== # spring
+  rootpassword: cm9vdA==
+  username: c3ByaW5n
+  password: c3ByaW5n
 
 ---
 apiVersion: v1
@@ -60,41 +60,41 @@ spec:
         app: mysql
     spec:
       containers:
-      - image: medinvention/mysql:arm
-        imagePullPolicy: Always
-        name: mysql
-        resources:
-          requests:
-            memory: 64Mi
-            cpu: 250m
-          limits:
-            memory: 128Mi
-            cpu: 500m
-        env:
-        - name: MYSQL_DATABASE
-          value: batch
-        - name: MYSQL_USER
-          valueFrom:
-            secretKeyRef:
-              name: mysqlsecret
-              key: username
-        - name: MYSQL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mysqlsecret
-              key: password
-        - name: MYSQL_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mysqlsecret
-              key: rootpassword
-        ports:
-        - containerPort: 3306
+        - image: medinvention/mysql:arm
+          imagePullPolicy: Always
           name: mysql
-        volumeMounts:
-        - name: mysql-persistent-storage
-          mountPath: /var/lib/mysql
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 250m
+            limits:
+              memory: 128Mi
+              cpu: 500m
+          env:
+            - name: MYSQL_DATABASE
+              value: batch
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysqlsecret
+                  key: username
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysqlsecret
+                  key: password
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysqlsecret
+                  key: rootpassword
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
       volumes:
-      - name: mysql-persistent-storage
-        persistentVolumeClaim:
-          claimName: mysql-pv-claim
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: mysql-pv-claim
