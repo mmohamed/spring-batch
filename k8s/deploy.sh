@@ -57,7 +57,7 @@ if [ $? != 0 ]; then
 	fi	
 else
 	# patch it
-	./kubectl --token=$TOKEN patch deployment springbatch -n springbatch -p '{"spec":{"template":{"metadata":{"labels":{"commit":"${commitID}"}}}}}'
+	./kubectl --token=$TOKEN patch deployment springbatch -n springbatch -p '{"spec":{"template":{"metadata":{"labels":{"commit":"`echo $commitID`}"}}}}}'
 	if [ $? != 0 ]; then
 		echo "Unable to patch application deploy !"
 		exit 1
