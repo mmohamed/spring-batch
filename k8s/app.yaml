@@ -91,8 +91,8 @@ spec:
               path: /health
               port: 8080
             initialDelaySeconds: 300
-            timeoutSeconds: 2
-            periodSeconds: 8
+            timeoutSeconds: 5
+            periodSeconds: 60
             failureThreshold: 1
 ---
 apiVersion: v1
