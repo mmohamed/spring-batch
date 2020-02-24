@@ -63,7 +63,7 @@ public class JobController {
 
         Boolean isAsync = request.getRequestURI().equals("/person/async/import");
 
-        File file = new File("csv/input/" + filename);
+        File file = new File("/app/csv/input/" + filename);
 
         if (!file.exists() || file.isDirectory()) {
             throw new BadRequestException(String.format("File with name [%s] not found !", filename));
@@ -130,7 +130,7 @@ public class JobController {
     @RequestMapping(value = { "/person/transform" }, method = RequestMethod.GET)
     public ExecutionReport runTransform(HttpServletRequest request, @RequestParam String filename) throws Exception {
 
-        File file = new File("csv/input/" + filename);
+        File file = new File("/app/csv/input/" + filename);
 
         if (!file.exists() || file.isDirectory()) {
             throw new BadRequestException(String.format("File with name [%s] not found !", filename));
