@@ -25,7 +25,12 @@ public class HomeController {
 
     @Autowired
     JobExplorer jobExplorer;
-
+    
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public ModelAndView toHome() {
+        return new ModelAndView("redirect:/home");
+    }
+    
     @RequestMapping(value = "/home", method = RequestMethod.GET)
     public ModelAndView home() {
         String jobNames[] = new String[] { "importUserJob", "exportUserJob", "transformJob" };
