@@ -57,7 +57,7 @@
 
 	<bean id="jsonFileWriter" class="com.capgemini.writer.PersonWriterToFile"
 		scope="step">
-		<property name="outputPath" value="csv/chunked/paged-#{stepExecutionContext[page]}.json" />
+		<property name="outputPath" value="/app/csv/chunked/paged-#{stepExecutionContext[page]}.json" />
 	</bean>
 
 	<bean id="dbReader" class="com.capgemini.reader.PersonReaderFromDataBase" scope="step">
@@ -68,22 +68,22 @@
 
 	<bean id="countThreadTasklet" class="com.capgemini.tasklet.CountingTasklet"
 		scope="step">
-		<property name="input" value="file:csv/input/#{jobParameters[filename]}" />
+		<property name="input" value="file:/app/csv/input/#{jobParameters[filename]}" />
 	</bean>
 
 	<bean id="cleanDBTasklet" class="com.capgemini.tasklet.CleanDBTasklet" />
 
 	<bean id="fileDeletingTasklet" class="com.capgemini.tasklet.FileDeletingTasklet">
-		<property name="directory" value="file:csv/chunked/" />
+		<property name="directory" value="file:/app/csv/chunked/" />
 	</bean>
 	
 	<bean id="concatFileTasklet" class="com.capgemini.tasklet.FileConcatTasklet">
-		<property name="directory" value="file:csv/chunked/" />
-		<property name="outputFilename" value="csv/output/export.json" />
+		<property name="directory" value="file:/app/csv/chunked/" />
+		<property name="outputFilename" value="/app/csv/output/export.json" />
 	</bean>
 
 	<bean id="filePartitioner" class="com.capgemini.partitioner.FilePartitioner">
-		<property name="outputPath" value="csv/chunked/" />
+		<property name="outputPath" value="/app/csv/chunked/" />
 	</bean>
 	
 	<bean id="dbPartitioner" class="com.capgemini.partitioner.DBPartitioner" scope="step">
@@ -92,17 +92,17 @@
 
 	<bean id="largeCSVReader" class="com.capgemini.reader.LineReaderFromFile"
 		scope="step">
-		<property name="inputPath" value="csv/input/#{jobParameters[filename]}" />
+		<property name="inputPath" value="/app/csv/input/#{jobParameters[filename]}" />
 	</bean>
 
 	<bean id="smallCSVWriter" class="com.capgemini.writer.LineWriterToFile"
 		scope="step">
-		<property name="outputPath" value="csv/chunked/"></property>
+		<property name="outputPath" value="/app/csv/chunked/"></property>
 	</bean>
 
 	<bean id="smallCSVFileReader" class="com.capgemini.reader.PersonReaderFromFile"
 		scope="step">
-		<constructor-arg value="csv/chunked/#{stepExecutionContext[file]}" />
+		<constructor-arg value="/app/csv/chunked/#{stepExecutionContext[file]}" />
 	</bean>
 
 	<bean id="importProcessor" class="com.capgemini.processor.ImportPersonItemProcessor" />
