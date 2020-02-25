@@ -23,7 +23,7 @@ public class ImportJobExecutionListener implements JobExecutionListener {
     }
 
     public void beforeJob(JobExecution jobExecution) {
-        String filename = "csv/input/" + jobExecution.getJobParameters().getString("filename");
+        String filename = "/app/csv/input/" + jobExecution.getJobParameters().getString("filename");
 
         ((PersonReaderFromFile) reader).initialize(filename);
         log.info("ImportReader initialized");
