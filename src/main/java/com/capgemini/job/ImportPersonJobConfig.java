@@ -28,9 +28,6 @@ import com.capgemini.writer.PersonWriterToDataBase;
 public class ImportPersonJobConfig {
 
     @Autowired
-    private JobBuilderFactory jobBuilderFactory;
-
-    @Autowired
     private StepBuilderFactory stepBuilderFactory;
 
     @Bean(name = "importReader")
@@ -56,7 +53,7 @@ public class ImportPersonJobConfig {
     @Bean
     public Job importUserJob(@Qualifier("importReader") ItemReader<Person> reader,
             @Qualifier("importWriter") ItemWriter<Person> writer,
-            @Qualifier("importProcessor") ImportPersonItemProcessor processor) {
+            @Qualifier("importProcessor") ImportPersonItemProcessor processor, JobBuilderFactory jobBuilderFactory) {
         return jobBuilderFactory.get("importUserJob").incrementer(new RunIdIncrementer()).flow(stepClean())
                 .next(stepImport(reader, writer, processor)).end().listener(new ImportJobExecutionListener(reader))
                 .validator(new FileNameParameterValidator()).build();

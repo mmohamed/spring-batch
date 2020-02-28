@@ -65,8 +65,21 @@ public class Tax {
         this.registrationDate = registrationDate;
     }
 
-    public Boolean equals(Tax tax) {
-        return tax.getSalary() == this.salary && this.getRegistrationDate() == this.registrationDate
-                && null != tax.getRate() && tax.getRate().equals(this.rate);
+    @Override
+    public boolean equals(Object tax) {
+        if (null == tax) {
+            return false;
+        }
+        if (this.getClass() != tax.getClass()) {
+            return false;
+        }
+        return ((Tax) tax).getSalary() == this.salary && this.getRegistrationDate() == this.registrationDate
+                && null != ((Tax) tax).getRate() && ((Tax) tax).getRate().equals(this.rate);
     }
+
+    @Override
+    public int hashCode() {
+        return (salary != null ? salary.hashCode() : 1) * (registrationDate != null ? registrationDate.hashCode() : 1);
+    }
+
 }

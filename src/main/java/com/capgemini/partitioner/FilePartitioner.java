@@ -23,7 +23,7 @@ public class FilePartitioner implements Partitioner {
 
         File[] fList = directory.listFiles();
 
-        Map<String, ExecutionContext> result = new HashMap<String, ExecutionContext>();
+        Map<String, ExecutionContext> result = new HashMap<>();
 
         for (File file : fList) {
 
@@ -37,10 +37,14 @@ public class FilePartitioner implements Partitioner {
             if (0 == extension.compareTo("csv") && file.isFile()) {
 
                 ExecutionContext exContext = new ExecutionContext();
-                log.info("Starting : Thread [" + index + "] for file : " + file.getName());
+
+                log.info("Starting : Thread [{}] for file : {}", index, file.getName());
+
                 exContext.put("name", "Thread" + index);
                 exContext.put("file", file.getName());
+                
                 result.put("partition" + index, exContext);
+                
                 index++;
             }
         }

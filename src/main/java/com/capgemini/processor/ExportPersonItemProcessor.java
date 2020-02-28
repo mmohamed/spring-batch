@@ -43,8 +43,8 @@ public class ExportPersonItemProcessor implements ItemProcessor<Person, Person> 
 
         if (!validation) {
 
-            log.info(String.format("Skipped person [%s] on export , caused by invalid Tax value [%s]!",
-                    transformedPerson.getId(), requestedTax.getValue()));
+            log.info("Skipped person [{}] on export , caused by invalid Tax value [{}]!", transformedPerson.getId(),
+                    requestedTax.getValue());
 
             return null;
         }

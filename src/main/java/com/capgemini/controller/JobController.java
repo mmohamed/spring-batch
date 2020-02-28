@@ -8,24 +8,28 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.capgemini.controller.exception.BadRequestException;
 import com.capgemini.controller.exception.NotFoundException;
 import com.capgemini.job.report.ExecutionReport;
+import com.capgemini.job.report.JobInstanceReport;
 
 @RestController
 public class JobController {
@@ -50,8 +54,8 @@ public class JobController {
     @Value("${DATA_PATH:}")
     String dataPath;
 
-    @RequestMapping(path = "/job/status", method = RequestMethod.GET)
-    public ExecutionReport jobStatus(@RequestParam(value = "id") Long id) throws Exception {
+    @GetMapping(path = "/job/status")
+    public ExecutionReport jobStatus(@RequestParam(value = "id") Long id) throws NotFoundException {
 
         JobExecution jobExecution = jobExplorer.getJobExecution(id);
 
@@ -62,8 +66,10 @@ public class JobController {
         return ExecutionReport.createFromJobExecution(jobExecution);
     }
 
-    @RequestMapping(value = { "/person/import", "person/async/import" }, method = RequestMethod.GET)
-    public ExecutionReport runImport(HttpServletRequest request, @RequestParam String filename) throws Exception {
+    @GetMapping(value = { "/person/import", "person/async/import" })
+    public ExecutionReport runImport(HttpServletRequest request, @RequestParam String filename)
+            throws BadRequestException, JobExecutionAlreadyRunningException, JobRestartException,
+            JobInstanceAlreadyCompleteException, JobParametersInvalidException {
 
         Boolean isAsync = request.getRequestURI().equals("/person/async/import");
 
@@ -77,8 +83,10 @@ public class JobController {
             throw new BadRequestException(String.format("File with name [%s] not validate (not csv) !", filename));
         }
 
-        JobParameters parameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
-                .addString("filename", filename).addString("type", isAsync ? "ASYNC" : "NORMAL").toJobParameters();
+        JobParameters parameters = new JobParametersBuilder()
+                .addLong(JobInstanceReport.TIMESTAMP_PARAM, System.currentTimeMillis())
+                .addString(JobInstanceReport.FILENAME_PARAM, filename).addString("type", isAsync ? "ASYNC" : "NORMAL")
+                .toJobParameters();
 
         JobExecution jobResult;
 
@@ -98,8 +106,10 @@ public class JobController {
         return ExecutionReport.createFromJobExecution(jobResult);
     }
 
-    @RequestMapping(value = { "/person/export", "/person/async/export" }, method = RequestMethod.GET)
-    public ExecutionReport runExport(HttpServletRequest request, @RequestParam String filename) throws Exception {
+    @GetMapping(value = { "/person/export", "/person/async/export" })
+    public ExecutionReport runExport(HttpServletRequest request, @RequestParam String filename)
+            throws BadRequestException, JobExecutionAlreadyRunningException, JobRestartException,
+            JobInstanceAlreadyCompleteException, JobParametersInvalidException {
 
         Boolean isAsync = request.getRequestURI().equals("/person/async/export");
 
@@ -107,9 +117,10 @@ public class JobController {
             throw new BadRequestException(String.format("File with name [%s] not validate (not json) !", filename));
         }
 
-        JobParameters parameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
-                .addString("filename", "sample-data.json").addString("type", isAsync ? "ASYNC" : "NORMAL")
-                .toJobParameters();
+        JobParameters parameters = new JobParametersBuilder()
+                .addLong(JobInstanceReport.TIMESTAMP_PARAM, System.currentTimeMillis())
+                .addString(JobInstanceReport.FILENAME_PARAM, "sample-data.json")
+                .addString("type", isAsync ? "ASYNC" : "NORMAL").toJobParameters();
 
         JobExecution jobResult;
 
@@ -129,8 +140,10 @@ public class JobController {
         return ExecutionReport.createFromJobExecution(jobResult);
     }
 
-    @RequestMapping(value = { "/person/transform" }, method = RequestMethod.GET)
-    public ExecutionReport runTransform(HttpServletRequest request, @RequestParam String filename) throws Exception {
+    @GetMapping("/person/transform")
+    public ExecutionReport runTransform(HttpServletRequest request, @RequestParam String filename)
+            throws BadRequestException, JobExecutionAlreadyRunningException, JobRestartException,
+            JobInstanceAlreadyCompleteException, JobParametersInvalidException {
 
         File file = new File(dataPath + "csv/input/" + filename);
 

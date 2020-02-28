@@ -16,17 +16,18 @@ public class DBPartitioner implements Partitioner {
 
     public Map<String, ExecutionContext> partition(int gridSize) {
 
-        Map<String, ExecutionContext> result = new HashMap<String, ExecutionContext>();
+        Map<String, ExecutionContext> result = new HashMap<>();
 
         for (int i = 0; i < gridSize; i++) {
 
             ExecutionContext exContext = new ExecutionContext();
 
-            log.info("Starting : Thread [" + i + "] for page : " + i);
+            log.info("Starting : Thread [{}] for page : {}", i, i);
 
             exContext.put("name", "ThreadDBRead" + i);
             exContext.put("page", i);
             exContext.put("size", pageSize);
+            
             result.put("partitionDB" + i, exContext);
         }
 

@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,18 +28,22 @@ public class CountingTasklet implements Tasklet, InitializingBean {
 
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-        log.info(String.format("Couting tasklet for %s file.", input.getFilename()));
+        log.info("Couting tasklet for {} file.", input.getFilename());
 
         File dir = input.getFile();
 
         final Path path = Paths.get(dir.getPath());
 
-        Long couting = Files.lines(path).count();
+        Long couting = 0L;
+
+        try (Stream<String> i = Files.lines(path)) {
+            couting = i.count();
+        }
 
         chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().putInt("chunk.count",
                 (int) (couting / 10));
 
-        log.info("Chunck input file is : " + (int) (couting / 10));
+        log.info("Chunck input file is : {}", (int) (couting / 10));
 
         return RepeatStatus.FINISHED;
     }

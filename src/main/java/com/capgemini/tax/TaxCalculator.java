@@ -1,5 +1,6 @@
 package com.capgemini.tax;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -17,7 +18,7 @@ public class TaxCalculator {
             return this.make(tax.getSalary(), tax.getRegistrationDate());
         }
         catch (Exception e) {
-            log.error("Unable to valdate Tax : " + e.getMessage());
+            log.error("Unable to valdate Tax : {}", e.getMessage());
 
             return null;
         }
@@ -28,23 +29,23 @@ public class TaxCalculator {
             return tax.equals(this.make(tax.getSalary(), tax.getRegistrationDate()));
         }
         catch (Exception e) {
-            log.error("Unable to valdate Tax : " + e.getMessage());
+            log.error("Unable to valdate Tax : {}", e.getMessage());
 
             return false;
         }
     }
 
-    private Tax make(Long salary, Date registrationDate) throws Exception {
+    private Tax make(Long salary, Date registrationDate) throws ParseException {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date limitDate = simpleDateFormat.parse("01/01/2017");
         Double rate;
 
         if (null == registrationDate) {
-            throw new Exception("To make  Tax, need registration date !");
+            throw new TaxCalculatorException("To make  Tax, need registration date !");
         }
 
         if (null == salary) {
-            throw new Exception("To make  Tax, need salary !");
+            throw new TaxCalculatorException("To make  Tax, need salary !");
         }
 
         if (registrationDate.after(limitDate)) {

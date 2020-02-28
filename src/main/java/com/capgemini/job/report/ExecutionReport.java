@@ -10,14 +10,21 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public class ExecutionReport {
 
     private Long id;
+
     private String status;
+
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private Date startedAt;
+
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private Date finishedAt;
+
     private JobInstanceReport jobInstanceReport;
+
     private Boolean isRunning;
+
     private Double timer;
+
     private String type;
 
     public ExecutionReport(JobInstanceReport jobInstanceReport, Long id, BatchStatus status, Date startTime,
@@ -32,8 +39,7 @@ public class ExecutionReport {
 
         if (null == startTime) {
             this.timer = 0D;
-        }
-        else {
+        } else {
             this.timer = (double) ((null == endTime ? new Date().getTime() : endTime.getTime()) - startTime.getTime())
                     / 1000;
         }
@@ -84,8 +90,8 @@ public class ExecutionReport {
         return jobInstanceReport;
     }
 
-    public void setJobInstanceReport(JobInstanceReport JobInstanceReport) {
-        this.jobInstanceReport = JobInstanceReport;
+    public void setJobInstanceReport(JobInstanceReport jobInstanceReport) {
+        this.jobInstanceReport = jobInstanceReport;
     }
 
     public Boolean isRunning() {

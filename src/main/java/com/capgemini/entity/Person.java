@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -53,6 +54,9 @@ public class Person {
     public Person(String firstName, String lastName) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.registredAt = new Date();
+        this.salary = 0L;
+        this.registrationNumber = "NONE";
     }
 
     public Long getId() {
@@ -116,7 +120,7 @@ public class Person {
         return "firstName: " + firstName + ", lastName: " + lastName;
     }
 
-    public String toJSON() throws Exception {
+    public String toJSON() throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
 
         DateFormat df = new SimpleDateFormat("d/M/yyyy");

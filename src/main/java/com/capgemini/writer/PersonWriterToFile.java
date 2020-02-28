@@ -27,7 +27,7 @@ public class PersonWriterToFile implements ItemWriter<Person> {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     public PersonWriterToFile() {
-        collection = new ArrayList<Person>();
+        collection = new ArrayList<>();
         autoInitialized = true;
     }
 
@@ -43,7 +43,7 @@ public class PersonWriterToFile implements ItemWriter<Person> {
 
     public void initialize(String filename) {
         autoInitialized = false;
-        collection = new ArrayList<Person>();
+        collection = new ArrayList<>();
         outputPath = filename;
     }
 
@@ -58,9 +58,9 @@ public class PersonWriterToFile implements ItemWriter<Person> {
         try {
             String jsonInString = mapper.writeValueAsString(collection);
 
-            Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.outputPath), "utf-8"));
-            writer.write(jsonInString);
-            writer.close();
+            try(Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this.outputPath), "utf-8"))){
+                writer.write(jsonInString);
+            }
         }
         catch (IOException ex) {
             log.error("Can't print JSON file");

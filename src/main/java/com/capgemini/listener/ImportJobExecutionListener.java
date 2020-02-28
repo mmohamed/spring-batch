@@ -31,8 +31,8 @@ public class ImportJobExecutionListener implements JobExecutionListener {
     public void afterJob(JobExecution jobExecution) {
         try {
             ((PersonReaderFromFile) reader).destroy();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception e) {            
+            log.error(e.getMessage());
         }
         log.info("ImportReader destroyed");
     }

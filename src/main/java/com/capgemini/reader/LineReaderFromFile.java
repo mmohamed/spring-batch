@@ -2,11 +2,9 @@ package com.capgemini.reader;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.NonTransientResourceException;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
 
 public class LineReaderFromFile implements ItemReader<String> {
 
@@ -21,7 +19,7 @@ public class LineReaderFromFile implements ItemReader<String> {
         this.inputPath = inputPath;
     }
 
-    public String read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+    public String read() throws IOException {
         if (null == reader) {
             reader = new BufferedReader(new FileReader(this.inputPath));
         }

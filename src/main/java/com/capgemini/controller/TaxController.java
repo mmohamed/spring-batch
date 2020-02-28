@@ -1,9 +1,9 @@
 package com.capgemini.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.capgemini.controller.exception.BadRequestException;
@@ -18,7 +18,7 @@ public class TaxController {
     @Autowired
     private TaxCalculator taxCalculator;
 
-    @RequestMapping(path = "/calculate", method = RequestMethod.POST)
+    @PostMapping(path = "/calculate")
     public Tax calculate(@RequestBody Tax tax) throws HTTPClientException {
 
         if (null == tax.getSalary() || null == tax.getRegistrationDate()) {
@@ -28,7 +28,7 @@ public class TaxController {
         return taxCalculator.calulate(tax);
     }
 
-    @RequestMapping(path = "/validate", method = RequestMethod.POST)
+    @PostMapping(path = "/validate")
     public Boolean validate(@RequestBody Tax tax) throws HTTPClientException {
 
         if (null == tax.getSalary() || null == tax.getRegistrationDate() || null == tax.getRate()) {

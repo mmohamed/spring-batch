@@ -18,16 +18,22 @@ public class PersonWriterToDataBase implements ItemWriter<Person> {
     private IPersonRepository iPersonRepository;
 
     public void write(List<? extends Person> items) throws Exception {
+
         for (Person person : items) {
+
+            String error = null;
 
             try {
                 iPersonRepository.save(person);
+            } catch (Exception exception) {
+
+                log.error("Can't save Person [{}], due to : {}", person.toJSON(), exception.getMessage());
+
+                error = exception.getMessage();
             }
-            catch (Exception exception) {
 
-                log.error("Can't save Person [" + person.toJSON() + "], due to : " + exception.getMessage());
-
-                throw exception;
+            if (null != error) {
+                throw new PersonWriterException(error);
             }
         }
     }

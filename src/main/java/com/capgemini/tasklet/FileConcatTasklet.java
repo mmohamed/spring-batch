@@ -3,13 +3,15 @@ package com.capgemini.tasklet;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -23,55 +25,30 @@ public class FileConcatTasklet implements Tasklet {
 
     private String outputFilename;
 
-    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws IOException {
 
         File dir = directory.getFile();
 
         File[] files = dir.listFiles();
 
-        OutputStream os = new FileOutputStream(new File(outputFilename), false);
+        try (OutputStream os = new FileOutputStream(new File(outputFilename), false)) {
 
-        Integer concatedFile = 0;
+            Integer concatedFile = 0;
 
-        for (int i = 0; i < files.length; i++) {
+            for (int i = 0; i < files.length; i++) {
 
-            if (files[i].getName().lastIndexOf("paged-") == 0) {
+                if (files[i].getName().lastIndexOf("paged-") == 0) {
 
-                InputStream in = new FileInputStream(files[i]);
+                    this.concat(os, files[i], files.length, concatedFile, i);
 
-                byte[] buffer = new byte[1 << 20]; // loads 1 MB of the file
+                    Files.delete(Paths.get(files[i].getPath()));
 
-                int count;
+                    log.info("{} readed and deleted!", files[i].getPath());
 
-                while ((count = in.read(buffer)) != -1) {
-
-                    if (count > 0 && i + 1 != files.length && buffer[count - 1] == ']') {
-                        buffer[count - 1] = ',';
-                    }
-
-                    if (count > 0 && concatedFile != 0 && buffer[0] == '[') {
-                        buffer[0] = ' ';
-                    }
-                    os.write(buffer, 0, count);
-                    os.flush();
+                    concatedFile++;
                 }
-
-                in.close();
-
-                boolean deleted = files[i].delete();
-
-                if (!deleted) {
-                    throw new UnexpectedJobExecutionException("Could not delete file" + files[i].getPath());
-                }
-                else {
-                    log.info(files[i].getPath() + " readed and deleted!");
-                }
-
-                concatedFile++;
             }
         }
-
-        os.close();
 
         return RepeatStatus.FINISHED;
     }
@@ -90,5 +67,28 @@ public class FileConcatTasklet implements Tasklet {
 
     public void setOutputFilename(String outputFilename) {
         this.outputFilename = outputFilename;
+    }
+
+    private void concat(OutputStream os, File file, Integer length, Integer concatedFile, Integer index)
+            throws IOException {
+        try (InputStream in = new FileInputStream(file)) {
+
+            byte[] buffer = new byte[1 << 20]; // loads 1 MB of the file
+
+            int count;
+
+            while ((count = in.read(buffer)) != -1) {
+
+                if (count > 0 && index + 1 != length && buffer[count - 1] == ']') {
+                    buffer[count - 1] = ',';
+                }
+
+                if (count > 0 && concatedFile != 0 && buffer[0] == '[') {
+                    buffer[0] = ' ';
+                }
+                os.write(buffer, 0, count);
+                os.flush();
+            }
+        }
     }
 }

@@ -22,11 +22,11 @@ public class LineWriterToFile implements ItemWriter<String> {
 
         int newFileIndex = new File(outputPath).listFiles().length;
 
-        FileWriter writer = new FileWriter(outputPath + "parsed-" + newFileIndex + ".csv");
+        try (FileWriter writer = new FileWriter(outputPath + "parsed-" + newFileIndex + ".csv")) {
 
-        for (String line : items) {
-            writer.append(line + "\n");
+            for (String line : items) {
+                writer.append(line + "\n");
+            }
         }
-        writer.close();
     }
 }

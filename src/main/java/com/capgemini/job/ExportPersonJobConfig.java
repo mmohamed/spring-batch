@@ -9,7 +9,6 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,12 +22,6 @@ import com.capgemini.writer.PersonWriterToFile;
 @Configuration
 @EnableBatchProcessing
 public class ExportPersonJobConfig {
-
-    @Autowired
-    private JobBuilderFactory jobBuilderFactory;
-
-    @Autowired
-    private StepBuilderFactory stepBuilderFactory;
 
     @Bean(name = "exportReader")
     public ItemReader<Person> reader() {
@@ -48,17 +41,18 @@ public class ExportPersonJobConfig {
     @Bean
     public Job exportUserJob(@Qualifier("exportReader") ItemReader<Person> reader,
             @Qualifier("exportWriter") ItemWriter<Person> writer,
-            @Qualifier("exportProcessor") ExportPersonItemProcessor processor) {
+            @Qualifier("exportProcessor") ExportPersonItemProcessor processor, JobBuilderFactory jobBuilderFactory,
+            StepBuilderFactory stepBuilderFactory) {
         return jobBuilderFactory.get("exportUserJob").incrementer(new RunIdIncrementer())
-                .flow(stepExport(reader, writer, processor)).end().listener(new ExportJobExecutionListener(writer))
-                .build();
+                .flow(stepExport(reader, writer, processor, stepBuilderFactory)).end()
+                .listener(new ExportJobExecutionListener(writer)).build();
     }
 
     @Bean(name = "stepExport")
     public Step stepExport(@Qualifier("exportReader") ItemReader<Person> reader,
             @Qualifier("exportWriter") ItemWriter<Person> writer,
-            @Qualifier("exportProcessor") ExportPersonItemProcessor processor) {
-        return stepBuilderFactory.get("stepExport").<Person, Person>chunk(10).reader(reader).processor(processor)
+            @Qualifier("exportProcessor") ExportPersonItemProcessor processor, StepBuilderFactory stepBuilderFactory) {
+        return stepBuilderFactory.get("stepExport").<Person, Person> chunk(10).reader(reader).processor(processor)
                 .writer(writer).build();
     }
 }

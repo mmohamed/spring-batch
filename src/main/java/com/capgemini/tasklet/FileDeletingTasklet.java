@@ -1,11 +1,13 @@
 package com.capgemini.tasklet;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -17,7 +19,7 @@ public class FileDeletingTasklet implements Tasklet {
 
     private Resource directory;
 
-    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws IOException {
 
         File dir = directory.getFile();
 
@@ -32,13 +34,9 @@ public class FileDeletingTasklet implements Tasklet {
             }
 
             if (0 == extension.compareTo("csv") || 0 == extension.compareTo("json")) {
-                boolean deleted = files[i].delete();
-                if (!deleted) {
-                    throw new UnexpectedJobExecutionException("Could not delete file " + files[i].getPath());
-                }
-                else {
-                    log.info(files[i].getPath() + " is deleted!");
-                }
+                Files.delete(Paths.get(files[i].getPath()));
+
+                log.info("{} is deleted!", files[i].getPath());
             }
 
         }

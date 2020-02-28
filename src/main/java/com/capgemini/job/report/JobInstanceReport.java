@@ -3,7 +3,10 @@ package com.capgemini.job.report;
 import org.springframework.batch.core.JobInstance;
 
 public class JobInstanceReport {
-
+    
+    public static final String TIMESTAMP_PARAM = "timestamp";
+    public static final String FILENAME_PARAM = "filename";
+    
     private Long id;
     private long instanceId;
     private String jobName;

@@ -1,13 +1,12 @@
 package com.capgemini.reader;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.NonTransientResourceException;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
@@ -37,11 +36,11 @@ public class PersonReaderFromFile implements ItemReader<Person> {
     }
 
     public void initialize(String filename) {
-        reader = new FlatFileItemReader<Person>();
+        reader = new FlatFileItemReader<>();
         file = new FileSystemResource(filename);
         reader.setResource(file);
 
-        DefaultLineMapper<Person> lineMapper = new DefaultLineMapper<Person>();
+        DefaultLineMapper<Person> lineMapper = new DefaultLineMapper<>();
 
         DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
         lineTokenizer.setDelimiter(",");
@@ -49,7 +48,7 @@ public class PersonReaderFromFile implements ItemReader<Person> {
         lineTokenizer
                 .setNames(new String[] { "registrationNumber", "firstName", "lastName", "salary", "registrationDate" });
 
-        BeanWrapperFieldSetMapper<Person> fieldSetMapper = new BeanWrapperFieldSetMapper<Person>();
+        BeanWrapperFieldSetMapper<Person> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
         fieldSetMapper.setTargetType(Person.class);
 
         lineMapper.setLineTokenizer(lineTokenizer);
@@ -60,29 +59,25 @@ public class PersonReaderFromFile implements ItemReader<Person> {
         reader.open(new ExecutionContext());
     }
 
-    public Person read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+    public Person read() throws Exception {
         if (null == reader) {
-            throw new Exception("FileReader don't initialized !");
+            throw new FileReaderException();
         }
 
         Person person = reader.read();
 
         if (null == person && autoInitialized) {
             destroy();
-            // and delete file
-            boolean deleted = file.getFile().delete();
-            if (!deleted) {
-                throw new UnexpectedJobExecutionException("Could not delete file " + file.getPath());
-            }
-            else {
-                log.info(file.getFile() + " readed and deleted!");
-            }
+
+            Files.delete(Paths.get(file.getPath()));
+
+            log.info("{} readed and deleted!", file.getFile());
         }
 
         return person;
     }
 
-    public void destroy() throws Exception {
+    public void destroy() {
         if (null != reader) {
             reader.close();
         }

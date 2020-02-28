@@ -42,7 +42,7 @@ public class PersonReaderFromDataBase implements ItemReader<Person> {
             this.cursor = this.iPersonRepository.findAll().iterator();
         }
         else {
-            log.info(String.format("Read from DB with page %d and size %d", page, size));
+            log.info("Read from DB with page {} and size {}", page, size);
 
             this.cursor = this.iPersonRepository.findAll(new PageRequest(page, size)).iterator();
         }
