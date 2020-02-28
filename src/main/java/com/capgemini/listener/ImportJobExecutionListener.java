@@ -23,8 +23,7 @@ public class ImportJobExecutionListener implements JobExecutionListener {
     }
 
     public void beforeJob(JobExecution jobExecution) {
-        String filename = "/app/csv/input/" + jobExecution.getJobParameters().getString("filename");
-
+        String filename = (null != System.getenv("DATA_PATH") ? System.getenv("DATA_PATH") : "") + "csv/input/" + jobExecution.getJobParameters().getString("filename");
         ((PersonReaderFromFile) reader).initialize(filename);
         log.info("ImportReader initialized");
     }
@@ -32,8 +31,7 @@ public class ImportJobExecutionListener implements JobExecutionListener {
     public void afterJob(JobExecution jobExecution) {
         try {
             ((PersonReaderFromFile) reader).destroy();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         log.info("ImportReader destroyed");

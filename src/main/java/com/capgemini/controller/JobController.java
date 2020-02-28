@@ -14,6 +14,7 @@ import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
@@ -46,6 +47,9 @@ public class JobController {
     @Qualifier("exportUserJob")
     Job exportJob;
 
+    @Value("${DATA_PATH:}")
+    String dataPath;
+
     @RequestMapping(path = "/job/status", method = RequestMethod.GET)
     public ExecutionReport jobStatus(@RequestParam(value = "id") Long id) throws Exception {
 
@@ -63,7 +67,7 @@ public class JobController {
 
         Boolean isAsync = request.getRequestURI().equals("/person/async/import");
 
-        File file = new File("/app/csv/input/" + filename);
+        File file = new File(dataPath + "csv/input/" + filename);
 
         if (!file.exists() || file.isDirectory()) {
             throw new BadRequestException(String.format("File with name [%s] not found !", filename));
@@ -87,8 +91,7 @@ public class JobController {
             simpleJobLauncher.setTaskExecutor(simpleAsyncTaskExecutor);
 
             jobResult = simpleJobLauncher.run(importJob, parameters);
-        }
-        else {
+        } else {
             jobResult = jobLauncher.run(importJob, parameters);
         }
 
@@ -119,8 +122,7 @@ public class JobController {
             simpleJobLauncher.setTaskExecutor(simpleAsyncTaskExecutor);
 
             jobResult = simpleJobLauncher.run(exportJob, parameters);
-        }
-        else {
+        } else {
             jobResult = jobLauncher.run(exportJob, parameters);
         }
 
@@ -130,7 +132,7 @@ public class JobController {
     @RequestMapping(value = { "/person/transform" }, method = RequestMethod.GET)
     public ExecutionReport runTransform(HttpServletRequest request, @RequestParam String filename) throws Exception {
 
-        File file = new File("/app/csv/input/" + filename);
+        File file = new File(dataPath + "csv/input/" + filename);
 
         if (!file.exists() || file.isDirectory()) {
             throw new BadRequestException(String.format("File with name [%s] not found !", filename));

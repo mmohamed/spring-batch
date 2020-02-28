@@ -76,6 +76,8 @@ spec:
                   key: password
             - name: DB_URL
               value: mysql.springbatch.svc.cluster.local:3306/batch
+            - name: DATA_PATH
+              value: /app/
           ports:
             - containerPort: 8080
           readinessProbe:
