@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 if [ -z "$CRT" ] || [ -z "$KEY" ]; then
@@ -42,7 +43,7 @@ until $rolloutStatusCmd || [ $attempts -eq 60 ]; do
   sleep 10
 done
 
-appdep=$(./kubectl --token=$TOKEN get deployment springbatch -n springbatch)
+appdep=$(./kubectl --token=$TOKEN get deployment app -n springbatch)
 if [ $? != 0 ]; then
 	# create new deploy
 	sed -i "s|{{crt}}|`echo $CRT`|g" app.yaml
@@ -57,7 +58,7 @@ if [ $? != 0 ]; then
 	fi	
 else
 	# patch it
-	./kubectl --token=$TOKEN patch deployment springbatch -n springbatch -p '{"spec":{"template":{"metadata":{"labels":{"commit":"'$commitID'"}}}}}'
+	./kubectl --token=$TOKEN patch deployment app -n springbatch -p '{"spec":{"template":{"metadata":{"labels":{"commit":"'$commitID'"}}}}}'
 	if [ $? != 0 ]; then
 		echo "Unable to patch application deploy !"
 		exit 1
@@ -66,7 +67,7 @@ fi
 
 # wait for ready
 attempts=0
-rolloutStatusCmd="./kubectl --token=$TOKEN rollout status deployment/springbatch -n springbatch"
+rolloutStatusCmd="./kubectl --token=$TOKEN rollout status deployment/app -n springbatch"
 until $rolloutStatusCmd || [ $attempts -eq 60 ]; do
   $rolloutStatusCmd
   attempts=$((attempts + 1))

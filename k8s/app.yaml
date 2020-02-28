@@ -22,10 +22,10 @@ kind: Ingress
 metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
-  name: springbatch
+  name: springbatch-ingress
   namespace: springbatch
   labels:
-    app: springbatch
+    app: app
 spec:
   rules:
     - host: {{host}}
@@ -44,23 +44,23 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: springbatch
+  name: app
   namespace: springbatch
   labels:
-    app: springbatch
+    app: app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: springbatch
+      app: app
   template:
     metadata:
       labels:
-        app: springbatch
+        app: app
         commit: '{{commit}}'
     spec:
       containers:
-        - name: springbatch
+        - name: app
           image: medinvention/spring-batch:arm
           imagePullPolicy: Always
           env:
@@ -108,4 +108,4 @@ spec:
     port: 80
     targetPort: 8080
   selector:
-    app: springbatch
+    app: app
