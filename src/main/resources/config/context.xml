@@ -40,9 +40,9 @@
     <bean id="dataSource"
         class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-        <property name="url" value="jdbc:mysql://localhost:3306/batch" />
-        <property name="username" value="batch" />
-        <property name="password" value="batch" />
+        <property name="url" value="jdbc:mysql://#{systemEnvironment['DB_URL']}" />
+        <property name="username" value="#{systemEnvironment['DB_USER']}" />
+        <property name="password" value="#{systemEnvironment['DB_PASS']}" />
     </bean>
     
 </beans>
