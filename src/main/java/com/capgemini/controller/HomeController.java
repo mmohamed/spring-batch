@@ -44,7 +44,7 @@ public class HomeController {
             try {
 
                 List<JobInstance> jobInstances = jobExplorer.getJobInstances(jobName, 0,
-                        jobExplorer.getJobInstanceCount(jobName));
+                        Math.min(3, jobExplorer.getJobInstanceCount(jobName)));
 
                 for (JobInstance jobInstance : jobInstances) {
 
