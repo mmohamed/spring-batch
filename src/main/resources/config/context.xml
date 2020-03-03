@@ -20,7 +20,7 @@
         <property name="taskExecutor" ref="taskExecutor" />
     </bean>
     
-    <jpa:repositories base-package="com.capgemini.dao" />
+    <jpa:repositories base-package="dev.medinvention.dao" />
     
     <bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
         <property name="showSql" value="false"/>
@@ -30,7 +30,7 @@
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="jpaVendorAdapter" ref="jpaVendorAdapter"/>
-        <property name="packagesToScan" value="com.capgemini.entity"/>
+        <property name="packagesToScan" value="dev.medinvention.entity"/>
     </bean>
 
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
