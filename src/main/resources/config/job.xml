@@ -55,61 +55,61 @@
 		</batch:tasklet>
 	</batch:step>
 
-	<bean id="jsonFileWriter" class="com.capgemini.writer.PersonWriterToFile"
+	<bean id="jsonFileWriter" class="dev.medinvention.writer.PersonWriterToFile"
 		scope="step">
 		<property name="outputPath" value="#{systemEnvironment['DATA_PATH']}csv/chunked/paged-#{stepExecutionContext[page]}.json" />
 	</bean>
 
-	<bean id="dbReader" class="com.capgemini.reader.PersonReaderFromDataBase" scope="step">
+	<bean id="dbReader" class="dev.medinvention.reader.PersonReaderFromDataBase" scope="step">
 		<property name="iPersonRepository" ref="IPersonRepository" />
 		<property name="page" value="#{stepExecutionContext[page]}"/>
 		<property name="size" value="#{stepExecutionContext[size]}"/>
 	</bean>
 
-	<bean id="countThreadTasklet" class="com.capgemini.tasklet.CountingTasklet"
+	<bean id="countThreadTasklet" class="dev.medinvention.tasklet.CountingTasklet"
 		scope="step">
 		<property name="input" value="file:#{systemEnvironment['DATA_PATH']}csv/input/#{jobParameters[filename]}" />
 	</bean>
 
-	<bean id="cleanDBTasklet" class="com.capgemini.tasklet.CleanDBTasklet" />
+	<bean id="cleanDBTasklet" class="dev.medinvention.tasklet.CleanDBTasklet" />
 
-	<bean id="fileDeletingTasklet" class="com.capgemini.tasklet.FileDeletingTasklet">
+	<bean id="fileDeletingTasklet" class="dev.medinvention.tasklet.FileDeletingTasklet">
 		<property name="directory" value="file:#{systemEnvironment['DATA_PATH']}csv/chunked/" />
 	</bean>
 	
-	<bean id="concatFileTasklet" class="com.capgemini.tasklet.FileConcatTasklet">
+	<bean id="concatFileTasklet" class="dev.medinvention.tasklet.FileConcatTasklet">
 		<property name="directory" value="file:#{systemEnvironment['DATA_PATH']}csv/chunked/" />
 		<property name="outputFilename" value="#{systemEnvironment['DATA_PATH']}csv/output/export.json" />
 	</bean>
 
-	<bean id="filePartitioner" class="com.capgemini.partitioner.FilePartitioner">
+	<bean id="filePartitioner" class="dev.medinvention.partitioner.FilePartitioner">
 		<property name="outputPath" value="#{systemEnvironment['DATA_PATH']}csv/chunked/" />
 	</bean>
 	
-	<bean id="dbPartitioner" class="com.capgemini.partitioner.DBPartitioner" scope="step">
+	<bean id="dbPartitioner" class="dev.medinvention.partitioner.DBPartitioner" scope="step">
 		<property name="pageSize" value="#{jobExecutionContext['chunk.count']}" />
 	</bean>
 
-	<bean id="largeCSVReader" class="com.capgemini.reader.LineReaderFromFile"
+	<bean id="largeCSVReader" class="dev.medinvention.reader.LineReaderFromFile"
 		scope="step">
 		<property name="inputPath" value="#{systemEnvironment['DATA_PATH']}csv/input/#{jobParameters[filename]}" />
 	</bean>
 
-	<bean id="smallCSVWriter" class="com.capgemini.writer.LineWriterToFile"
+	<bean id="smallCSVWriter" class="dev.medinvention.writer.LineWriterToFile"
 		scope="step">
 		<property name="outputPath" value="#{systemEnvironment['DATA_PATH']}csv/chunked/"></property>
 	</bean>
 
-	<bean id="smallCSVFileReader" class="com.capgemini.reader.PersonReaderFromFile"
+	<bean id="smallCSVFileReader" class="dev.medinvention.reader.PersonReaderFromFile"
 		scope="step">
 		<constructor-arg value="#{systemEnvironment['DATA_PATH']}csv/chunked/#{stepExecutionContext[file]}" />
 	</bean>
 
-	<bean id="importProcessor" class="com.capgemini.processor.ImportPersonItemProcessor" />
+	<bean id="importProcessor" class="dev.medinvention.processor.ImportPersonItemProcessor" />
 
-	<bean id="exportProcessor" class="com.capgemini.processor.ExportPersonItemProcessor" />
+	<bean id="exportProcessor" class="dev.medinvention.processor.ExportPersonItemProcessor" />
 
-	<bean id="dbWriter" class="com.capgemini.writer.PersonWriterToDataBase">
+	<bean id="dbWriter" class="dev.medinvention.writer.PersonWriterToDataBase">
 		<property name="iPersonRepository" ref="IPersonRepository" />
 	</bean>
 

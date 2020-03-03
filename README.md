@@ -8,7 +8,7 @@ This document contains information on how to use application.
 1) Run project with IDE
 ----------------------------------
 
-After clone project, import it on `Maven project` and use `Run as application` with **com.capgemini.main.Application** as Main class.
+After clone project, import it on `Maven project` and use `Run as application` with **dev.medinvention.main.Application** as Main class.
 
 2) Run project with CLI
 ----------------------------------
